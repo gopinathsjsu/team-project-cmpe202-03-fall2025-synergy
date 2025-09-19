@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import './App.css'
 
 function App() {
@@ -8,7 +9,13 @@ function App() {
     <div className="container">
       <header className="header">
         <h1>Synergy</h1>
-        <p>A basic React page scaffolded with Vite.</p>
+        <p>Campus Marketplace — buy/sell within campus.</p>
+        <nav className="row" style={{justifyContent: 'center'}}>
+          <Link to="/listings" className="button">Listings</Link>
+          <Link to="/listings/new" className="button">Create</Link>
+          <Link to="/chat" className="button">Chat</Link>
+          <Link to="/admin" className="button">Admin</Link>
+        </nav>
       </header>
 
       <section className="card">
