@@ -56,3 +56,4 @@ API base URL: `http://localhost:8080`
 
 - Frontend: set `VITE_API_BASE` to point to deployed backend in production
 - Backend config: `backend/src/main/resources/application.yml`
+
