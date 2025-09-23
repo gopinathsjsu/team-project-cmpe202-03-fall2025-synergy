@@ -1,24 +1,25 @@
 import { useMemo, useState } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useMarketPlaceContext } from '../context/marketPlaceContext'
 
-type Listing = {
-  id: number
-  title: string
-  price: number
-  image: string
-  category: string
-  seller: string
-  posted: string
-}
+// type Listing = {
+//   id: number
+//   title: string
+//   price: number
+//   image: string
+//   category: string
+//   seller: string
+//   posted: string
+// }
 
-const seed: Listing[] = [
-  { id: 1, title: 'Calculus Textbook - Stewart 8th', price: 45, image: 'https://placehold.co/300x200?text=Calculus%20Textbook', category: 'Textbooks', seller: 'John Doe', posted: '2h ago' },
-  { id: 2, title: 'MacBook Pro 13" (2020)', price: 1200, image: 'https://placehold.co/300x200?text=MacBook%20Pro', category: 'Electronics', seller: 'Jane Smith', posted: '1d ago' },
-  { id: 3, title: 'Gaming Chair - Ergonomic', price: 150, image: 'https://placehold.co/300x200?text=Gaming%20Chair', category: 'Furniture', seller: 'Mike', posted: '3d ago' },
-  { id: 4, title: 'Data Structures Textbook', price: 30, image: 'https://placehold.co/300x200?text=DS%20Textbook', category: 'Textbooks', seller: 'Sara', posted: '5h ago' },
-  { id: 5, title: 'Mechanical Keyboard', price: 80, image: 'https://placehold.co/300x200?text=Keyboard', category: 'Electronics', seller: 'Tom', posted: '6h ago' },
-]
+// const seed: Listing[] = [
+//   { id: 1, title: 'Calculus Textbook - Stewart 8th', price: 45, image: 'https://placehold.co/300x200?text=Calculus%20Textbook', category: 'Textbooks', seller: 'John Doe', posted: '2h ago' },
+//   { id: 2, title: 'MacBook Pro 13" (2020)', price: 1200, image: 'https://placehold.co/300x200?text=MacBook%20Pro', category: 'Electronics', seller: 'Jane Smith', posted: '1d ago' },
+//   { id: 3, title: 'Gaming Chair - Ergonomic', price: 150, image: 'https://placehold.co/300x200?text=Gaming%20Chair', category: 'Furniture', seller: 'Mike', posted: '3d ago' },
+//   { id: 4, title: 'Data Structures Textbook', price: 30, image: 'https://placehold.co/300x200?text=DS%20Textbook', category: 'Textbooks', seller: 'Sara', posted: '5h ago' },
+//   { id: 5, title: 'Mechanical Keyboard', price: 80, image: 'https://placehold.co/300x200?text=Keyboard', category: 'Electronics', seller: 'Tom', posted: '6h ago' },
+// ]
 
 const categories = ['All', 'Textbooks', 'Electronics', 'Furniture', 'Gaming']
 
@@ -28,8 +29,10 @@ const ListingsPage = () => {
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
 
+  const { listings } = useMarketPlaceContext()
+
   const filtered = useMemo(() => {
-    return seed.filter((l) => {
+    return listings.filter((l) => {
       const matchesQuery = l.title.toLowerCase().includes(query.toLowerCase())
       const matchesCategory = category === 'All' || l.category === category
       const minOk = minPrice ? l.price >= Number(minPrice) : true
