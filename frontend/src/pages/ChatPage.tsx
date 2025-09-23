@@ -1,76 +1,32 @@
-import { useState } from 'react'
-import { Send, MessageCircle, User } from 'lucide-react'
+import { useEffect, useState } from "react";
+import { Send, MessageCircle } from "lucide-react";
+import { useChat } from "../context/chatContext";
 
 const ChatPage = () => {
-  const [activeChat, setActiveChat] = useState(0)
-  const [message, setMessage] = useState('')
+  const {
+    conversations,
+    activeConversation,
+    activeMessages,
+    activeChatId,
+    selectConversation,
+    sendMessage,
+    scrollRef,
+  } = useChat();
 
-  const conversations = [
-    {
-      id: 1,
-      user: 'John Doe',
-      lastMessage: 'Is the textbook still available?',
-      timestamp: '2 min ago',
-      unread: 2,
-      avatar: 'https://via.placeholder.com/40x40?text=JD'
-    },
-    {
-      id: 2,
-      user: 'Jane Smith',
-      lastMessage: 'What\'s the condition of the laptop?',
-      timestamp: '1 hour ago',
-      unread: 0,
-      avatar: 'https://via.placeholder.com/40x40?text=JS'
-    },
-    {
-      id: 3,
-      user: 'Mike Johnson',
-      lastMessage: 'Thanks for the quick response!',
-      timestamp: '3 hours ago',
-      unread: 0,
-      avatar: 'https://via.placeholder.com/40x40?text=MJ'
-    }
-  ]
-
-  const messages = [
-    {
-      id: 1,
-      sender: 'John Doe',
-      content: 'Hi! Is the Calculus textbook still available?',
-      timestamp: '2:30 PM',
-      isOwn: false
-    },
-    {
-      id: 2,
-      sender: 'You',
-      content: 'Yes, it\'s still available! It\'s in great condition.',
-      timestamp: '2:32 PM',
-      isOwn: true
-    },
-    {
-      id: 3,
-      sender: 'John Doe',
-      content: 'Perfect! What\'s the lowest price you can do?',
-      timestamp: '2:35 PM',
-      isOwn: false
-    },
-    {
-      id: 4,
-      sender: 'You',
-      content: 'I can do $40 if you can pick it up today.',
-      timestamp: '2:36 PM',
-      isOwn: true
-    }
-  ]
+  const [message, setMessage] = useState("");
 
   const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (message.trim()) {
-      // TODO: Implement message sending logic
-      console.log('Sending message:', message)
-      setMessage('')
+    e.preventDefault();
+    if (!message.trim()) return;
+    sendMessage(message);
+    setMessage("");
+  };
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }
+  }, [activeMessages, scrollRef]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -87,12 +43,12 @@ const ChatPage = () => {
               <h3 className="font-medium text-gray-900">Conversations</h3>
             </div>
             <div className="overflow-y-auto">
-              {conversations.map((conversation, index) => (
+              {conversations.map((conversation) => (
                 <div
                   key={conversation.id}
-                  onClick={() => setActiveChat(index)}
+                  onClick={() => selectConversation(conversation.id)}
                   className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${
-                    activeChat === index ? 'bg-primary-50 border-primary-200' : ''
+                    activeChatId === conversation.id ? "bg-primary-50 border-primary-200" : ""
                   }`}
                 >
                   <div className="flex items-center space-x-3">
@@ -128,14 +84,16 @@ const ChatPage = () => {
             {/* Chat Header */}
             <div className="p-4 border-b border-gray-200 bg-white">
               <div className="flex items-center space-x-3">
-                <img
-                  src={conversations[activeChat]?.avatar}
-                  alt={conversations[activeChat]?.user}
-                  className="w-8 h-8 rounded-full"
-                />
+                {activeConversation && (
+                  <img
+                    src={activeConversation.avatar}
+                    alt={activeConversation.user}
+                    className="w-8 h-8 rounded-full"
+                  />
+                )}
                 <div>
                   <h4 className="font-medium text-gray-900">
-                    {conversations[activeChat]?.user}
+                    {activeConversation?.user ?? "Select a conversation"}
                   </h4>
                   <p className="text-sm text-gray-500">Online</p>
                 </div>
@@ -143,26 +101,19 @@ const ChatPage = () => {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+            <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto bg-gray-50">
               <div className="space-y-4">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}
-                  >
+                {activeMessages.map((msg) => (
+                  <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                         msg.isOwn
-                          ? 'bg-primary-600 text-white'
-                          : 'bg-white text-gray-900 border border-gray-200'
+                          ? "bg-primary-600 text-white"
+                          : "bg-white text-gray-900 border border-gray-200"
                       }`}
                     >
                       <p className="text-sm">{msg.content}</p>
-                      <p
-                        className={`text-xs mt-1 ${
-                          msg.isOwn ? 'text-primary-100' : 'text-gray-500'
-                        }`}
-                      >
+                      <p className={`text-xs mt-1 ${msg.isOwn ? "text-primary-100" : "text-gray-500"}`}>
                         {msg.timestamp}
                       </p>
                     </div>
@@ -181,10 +132,7 @@ const ChatPage = () => {
                   placeholder="Type a message..."
                   className="flex-1 input-field"
                 />
-                <button
-                  type="submit"
-                  className="btn-primary flex items-center space-x-2"
-                >
+                <button type="submit" className="btn-primary flex items-center space-x-2">
                   <Send className="h-4 w-4" />
                   <span>Send</span>
                 </button>
@@ -194,7 +142,7 @@ const ChatPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ChatPage
+export default ChatPage;
