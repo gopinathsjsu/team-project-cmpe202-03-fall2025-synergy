@@ -76,7 +76,7 @@ const CreateListingPage = () => {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2 description-label">
               Description *
             </label>
             <textarea
@@ -94,7 +94,7 @@ const CreateListingPage = () => {
           {/* Price and Category */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2 price-label">
                 Price ($) *
               </label>
               <div className="relative">
