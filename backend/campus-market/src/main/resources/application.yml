@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: h2   # change to 'mysql' when you switch
+
+# Common JPA settings
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate.format_sql: true
+
+server:
+  port: 8080
