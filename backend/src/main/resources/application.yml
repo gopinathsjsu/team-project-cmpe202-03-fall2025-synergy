@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: campus-marketplace
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/campus_marketplace
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  security:
+    user:
+      name: admin
+      password: admin
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+logging:
+  level:
+    com.example.app: DEBUG
+    org.springframework.security: DEBUG

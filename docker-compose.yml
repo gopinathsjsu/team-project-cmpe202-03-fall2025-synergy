@@ -73,20 +73,20 @@ services:
       - campus-network
 
   # Nginx Reverse Proxy (for production-like setup)
-  nginx:
-    image: nginx:alpine
-    container_name: campus-marketplace-nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - ./nginx/ssl:/etc/nginx/ssl
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - campus-network
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: campus-marketplace-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./nginx/ssl:/etc/nginx/ssl
+  #   depends_on:
+  #     - frontend
+  #     - backend
+  #   networks:
+  #     - campus-network
 
 volumes:
   postgres_data:
