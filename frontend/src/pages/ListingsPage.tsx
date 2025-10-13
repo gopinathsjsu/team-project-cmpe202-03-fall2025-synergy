@@ -1,81 +1,102 @@
 import { useMemo, useState, useEffect } from 'react'
-import { Search, SlidersHorizontal } from 'lucide-react'
+import { Search, SlidersHorizontal, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
-
-// type Listing = {
-//   id: number
-//   title: string
-//   price: number
-//   image: string
-//   category: string
-//   seller: string
-//   posted: string
-// }
-
-// const seed: Listing[] = [
-//   { id: 1, title: 'Calculus Textbook - Stewart 8th', price: 45, image: 'https://placehold.co/300x200?text=Calculus%20Textbook', category: 'Textbooks', seller: 'John Doe', posted: '2h ago' },
-//   { id: 2, title: 'MacBook Pro 13" (2020)', price: 1200, image: 'https://placehold.co/300x200?text=MacBook%20Pro', category: 'Electronics', seller: 'Jane Smith', posted: '1d ago' },
-//   { id: 3, title: 'Gaming Chair - Ergonomic', price: 150, image: 'https://placehold.co/300x200?text=Gaming%20Chair', category: 'Furniture', seller: 'Mike', posted: '3d ago' },
-//   { id: 4, title: 'Data Structures Textbook', price: 30, image: 'https://placehold.co/300x200?text=DS%20Textbook', category: 'Textbooks', seller: 'Sara', posted: '5h ago' },
-//   { id: 5, title: 'Mechanical Keyboard', price: 80, image: 'https://placehold.co/300x200?text=Keyboard', category: 'Electronics', seller: 'Tom', posted: '6h ago' },
-// ]
-
-const categories = ['All', 'Textbooks', 'Electronics', 'Furniture', 'Gaming']
+import Pagination from '../components/Pagination'
 
 const ListingsPage = () => {
+  // Filter state
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
-  const [products, setProducts] = useState<Product[]>([])
+  
+  // Data state
+  const [allProducts, setAllProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>('')
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0)
+  const [pageSize, setPageSize] = useState(10)
 
-  // Debounce search query
+  // Fetch all products on mount
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      performSearch()
-    }, 500) // Wait 500ms after user stops typing
+    const fetchAllProducts = async () => {
+      setLoading(true)
+      setError('')
+      console.log('[ListingsPage] Fetching all products...')
+      try {
+        const products = await productApi.getAll()
+        console.log('[ListingsPage] Received products:', products.length)
+        setAllProducts(products)
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.error || err.message || 'Failed to load products'
+        console.error('[ListingsPage] Error fetching products:', err)
+        setError(errorMessage)
+        setAllProducts([])
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    return () => clearTimeout(timeoutId)
-  }, [query])
-
-  // Load products on mount
-  useEffect(() => {
-    performSearch()
+    fetchAllProducts()
   }, [])
 
-  const performSearch = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      let results: Product[]
-      if (query.trim()) {
-        // Use semantic search when there's a query
-        results = await productApi.search(query.trim(), 50)
-      } else {
-        // Get all active products when no query
-        results = await productApi.getActive()
-      }
-      setProducts(results)
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to load products')
-      console.error('Search error:', err)
-    } finally {
-      setLoading(false)
-    }
+  // Client-side filtering: category, price range, and keyword search
+  const filteredProducts = useMemo(() => {
+    return allProducts.filter((p) => {
+      // Category filter
+      const matchesCategory = category === 'All' || p.category === category
+      
+      // Price range filter
+      const price = Number(p.price)
+      const minOk = minPrice ? price >= Number(minPrice) : true
+      const maxOk = maxPrice ? price <= Number(maxPrice) : true
+      
+      // Keyword search (name or description)
+      const searchTerm = query.toLowerCase().trim()
+      const matchesSearch = !searchTerm || 
+        (p.name?.toLowerCase().includes(searchTerm) || 
+         p.description?.toLowerCase().includes(searchTerm))
+      
+      return matchesCategory && minOk && maxOk && matchesSearch
+    })
+  }, [allProducts, category, minPrice, maxPrice, query])
+
+  // Get unique categories from products for dropdown
+  const availableCategories = useMemo(() => {
+    const categories = new Set<string>(['All'])
+    allProducts.forEach(p => {
+      if (p.category) categories.add(p.category)
+    })
+    return Array.from(categories).sort()
+  }, [allProducts])
+
+  // Client-side pagination
+  const totalElements = filteredProducts.length
+  const totalPages = Math.ceil(totalElements / pageSize)
+  const startIndex = currentPage * pageSize
+  const endIndex = startIndex + pageSize
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [category, minPrice, maxPrice, query, pageSize])
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const filtered = useMemo(() => {
-    return products.filter((p) => {
-      const matchesCategory = category === 'All' || p.category === category
-      const minOk = minPrice ? Number(p.price) >= Number(minPrice) : true
-      const maxOk = maxPrice ? Number(p.price) <= Number(maxPrice) : true
-      return matchesCategory && minOk && maxOk
-    })
-  }, [products, category, minPrice, maxPrice])
+  // Handle page size change
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size)
+    setCurrentPage(0)
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -102,12 +123,19 @@ const ListingsPage = () => {
                 className="input-field pl-10"
               />
             </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Search by name or description
+            </p>
           </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-field">
-              {categories.map((c) => (
+            <select 
+              value={category} 
+              onChange={(e) => setCategory(e.target.value)} 
+              className="input-field"
+            >
+              {availableCategories.map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>
@@ -122,6 +150,7 @@ const ListingsPage = () => {
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
                 className="input-field"
+                min="0"
               />
               <input
                 type="number"
@@ -129,6 +158,7 @@ const ListingsPage = () => {
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
                 className="input-field"
+                min="0"
               />
             </div>
           </div>
@@ -138,38 +168,85 @@ const ListingsPage = () => {
         <section className="lg:col-span-3">
           {error && (
             <div className="card bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-              {error}
+              <p className="font-semibold mb-1">Error</p>
+              <p>{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-2 text-sm underline hover:no-underline"
+              >
+                Retry
+              </button>
             </div>
           )}
+          
           {loading ? (
             <div className="card text-center py-16">
-              <p className="text-gray-600">Searching...</p>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary-600 mb-4" />
+              <p className="text-gray-600">Loading products...</p>
             </div>
-          ) : filtered.length === 0 ? (
+          ) : paginatedProducts.length === 0 ? (
             <div className="card text-center py-16">
-              <p className="text-gray-600">No results. Try adjusting search or filters.</p>
+              <p className="text-gray-600">
+                {allProducts.length === 0 
+                  ? 'No products found in the database.'
+                  : `No products match your filters. (${totalElements} total products)`}
+              </p>
+              {allProducts.length > 0 && (
+                <button
+                  onClick={() => {
+                    setQuery('')
+                    setCategory('All')
+                    setMinPrice('')
+                    setMaxPrice('')
+                  }}
+                  className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filtered.map((p) => (
-                <Link key={p.id} to={`/listing/${p.id}`} className="card hover:shadow-md transition-shadow block">
-                  <img 
-                    src={p.imageUrl || 'https://placehold.co/300x200?text=No+Image'} 
-                    alt={p.name} 
-                    className="w-full h-48 object-cover rounded-lg mb-4" 
-                  />
-                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{p.name}</h3>
-                  <p className="text-2xl font-bold text-primary-600">${p.price}</p>
-                  <div className="flex justify-between text-sm text-gray-500 mt-2">
-                    <span>{p.category || 'Uncategorized'}</span>
-                    {p.condition && <span>{p.condition}</span>}
-                  </div>
-                  {p.description && (
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{p.description}</p>
-                  )}
-                </Link>
-              ))}
-            </div>
+            <>
+              <div className="mb-4 text-sm text-gray-600">
+                Showing {startIndex + 1} to {Math.min(endIndex, totalElements)} of {totalElements} products
+                {query && ` matching "${query}"`}
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {paginatedProducts.map((p) => (
+                  <Link key={p.id} to={`/listing/${p.id}`} className="card hover:shadow-md transition-shadow block">
+                    <div className="relative">
+                      <img 
+                        src={p.imageUrl || 'https://placehold.co/300x200?text=No+Image'} 
+                        alt={p.name} 
+                        className="w-full h-48 object-cover rounded-lg mb-4" 
+                      />
+                    </div>
+                    <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{p.name}</h3>
+                    <p className="text-2xl font-bold text-primary-600">${p.price}</p>
+                    <div className="flex justify-between text-sm text-gray-500 mt-2">
+                      <span>{p.category || 'Uncategorized'}</span>
+                      {p.condition && <span>{p.condition}</span>}
+                    </div>
+                    {p.description && (
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{p.description}</p>
+                    )}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalPages > 0 && (
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  pageSize={pageSize}
+                  onPageSizeChange={handlePageSizeChange}
+                  totalElements={totalElements}
+                />
+              )}
+            </>
           )}
         </section>
       </div>

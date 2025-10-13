@@ -1,5 +1,6 @@
 package com.example.app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -33,7 +34,7 @@ public class Product {
     @Column(name = "seller_id")
     private Long sellerId;
     
-    @Column(name = "image_url", length = 500)
+    @Column(name = "image_url", columnDefinition = "TEXT")
     private String imageUrl;
     
     @Column(name = "status")
@@ -45,9 +46,14 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    @Column(name = "embedding", columnDefinition = "vector(384)")
+    @Column(name = "embedding", columnDefinition = "vector(384)", insertable = false, updatable = false, nullable = true)
     @JdbcTypeCode(SqlTypes.OTHER)
-    private String embedding; // Stored as string representation of vector
+    @JsonIgnore // Don't include embedding in API responses
+    @Lob
+    private byte[] embedding; // Vector type stored as binary - excluded from API responses
+    
+    @Transient
+    private Double matchPercentage; // Match percentage for search results (not persisted)
     
     @PrePersist
     protected void onCreate() {
@@ -162,12 +168,20 @@ public class Product {
         this.updatedAt = updatedAt;
     }
     
-    public String getEmbedding() {
+    public byte[] getEmbedding() {
         return embedding;
     }
     
-    public void setEmbedding(String embedding) {
+    public void setEmbedding(byte[] embedding) {
         this.embedding = embedding;
+    }
+    
+    public Double getMatchPercentage() {
+        return matchPercentage;
+    }
+    
+    public void setMatchPercentage(Double matchPercentage) {
+        this.matchPercentage = matchPercentage;
     }
 }
 

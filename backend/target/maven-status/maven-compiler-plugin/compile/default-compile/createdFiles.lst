@@ -18,6 +18,7 @@ com/example/app/util/JwtUtil.class
 com/example/app/dto/AuthResponse.class
 com/example/app/repository/UserRepository.class
 com/example/app/config/WebConfig$1.class
+com/example/app/controller/ListingsController.class
 com/example/app/dto/startChatRequest.class
 com/example/app/dto/RegisterRequest.class
 com/example/app/model/Chat.class
@@ -27,6 +28,7 @@ com/example/app/repository/ChatRepository.class
 com/example/app/config/CustomUserDetailsService.class
 com/example/app/config/SecurityConfig.class
 com/example/app/controller/AuthController.class
+com/example/app/dto/PaginatedResponse.class
 com/example/app/controller/UserController.class
 com/example/app/service/UserService.class
 com/example/app/dto/UserIdRequest.class

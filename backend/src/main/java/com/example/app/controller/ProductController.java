@@ -1,7 +1,10 @@
 package com.example.app.controller;
 
 import com.example.app.model.Product;
+import com.example.app.repository.ProductRepository;
 import com.example.app.service.ProductService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,16 +17,24 @@ import java.util.Map;
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class ProductController {
     
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    
+    @Autowired
+    private ProductRepository productRepository;
+    
     @Autowired
     private ProductService productService;
     
     /**
-     * Get all products
+     * Get all products - returns all products from database (no pagination, no filtering)
+     * GET /api/products
      */
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+    public List<Product> getAllProducts() {
+        logger.info("GET /api/products - Fetching all products from database");
+        List<Product> products = productRepository.findAll();
+        logger.info("Returning {} products", products.size());
+        return products;
     }
     
     /**

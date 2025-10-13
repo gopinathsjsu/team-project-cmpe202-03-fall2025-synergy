@@ -33,8 +33,13 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/auth/register", "/auth/login", "/users", "/products/search", "/products/active").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/auth/**").permitAll()
+                .requestMatchers("/users/**").permitAll()
+                .requestMatchers("/products/**").permitAll()
+                .requestMatchers("/listings/**").permitAll()
+                .requestMatchers("/admin/**").permitAll()
+                .requestMatchers("/error").permitAll()
+                .anyRequest().permitAll() // Changed from authenticated() to permitAll() for now
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

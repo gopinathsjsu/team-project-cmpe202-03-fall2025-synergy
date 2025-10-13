@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Upload, X, DollarSign, Tag, FileText } from 'lucide-react'
+import { productApi } from '../services/productApi'
 
 const CreateListingPage = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -10,6 +13,8 @@ const CreateListingPage = () => {
     condition: 'good'
   })
   const [images, setImages] = useState<File[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>('')
 
   const categories = [
     'Textbooks',
@@ -29,10 +34,83 @@ const CreateListingPage = () => {
     { value: 'poor', label: 'Poor' }
   ]
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Convert image file to base64 data URL
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = (error) => reject(error)
+    })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement listing creation logic
-    console.log('Creating listing:', formData, images)
+    setError('')
+    setLoading(true)
+
+    try {
+      // Get user ID from localStorage
+      const userId = localStorage.getItem('userId')
+      if (!userId) {
+        setError('You must be logged in to create a listing')
+        setLoading(false)
+        return
+      }
+
+      // Validate required fields
+      if (!formData.title.trim() || !formData.description.trim() || !formData.price || !formData.category) {
+        setError('Please fill in all required fields')
+        setLoading(false)
+        return
+      }
+
+      // Convert first image to base64 if available
+      // Note: Base64 images can be very long, so we'll use a placeholder for now
+      // In production, you should upload images to a file storage service (S3, etc.)
+      let imageUrl: string | undefined = undefined
+      if (images.length > 0) {
+        try {
+          // For now, we'll use a data URL but note that it may be too long for the database
+          // Consider implementing proper image upload to a file storage service
+          const base64 = await fileToBase64(images[0])
+          // Limit to reasonable size (e.g., 1MB base64 = ~1.3MB original)
+          // If too long, we'll skip it and use a placeholder
+          if (base64.length > 1000000) { // ~1MB limit
+            console.warn('Image too large, skipping base64 encoding')
+            imageUrl = undefined // Will be set to null in database
+          } else {
+            imageUrl = base64
+          }
+        } catch (err) {
+          console.error('Error converting image:', err)
+          // Continue without image if conversion fails
+        }
+      }
+
+      // Create product object
+      const productData = {
+        name: formData.title.trim(),
+        description: formData.description.trim(),
+        price: parseFloat(formData.price),
+        category: formData.category,
+        condition: formData.condition,
+        sellerId: parseInt(userId),
+        imageUrl: imageUrl,
+        status: 'ACTIVE'
+      }
+
+      // Call API to create product
+      const createdProduct = await productApi.create(productData)
+      
+      // Success - redirect to listings page or product detail page
+      navigate(`/listings`, { replace: true })
+    } catch (err: any) {
+      console.error('Error creating listing:', err)
+      setError(err.response?.data?.error || 'Failed to create listing. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -56,6 +134,12 @@ const CreateListingPage = () => {
       <div className="card">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Listing</h1>
         
+        {error && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
           <div>
@@ -213,14 +297,17 @@ const CreateListingPage = () => {
             <button
               type="button"
               className="btn-secondary"
+              onClick={() => navigate('/listings')}
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               type="submit"
               className="btn-primary"
+              disabled={loading}
             >
-              Create Listing
+              {loading ? 'Creating...' : 'Create Listing'}
             </button>
           </div>
         </form>

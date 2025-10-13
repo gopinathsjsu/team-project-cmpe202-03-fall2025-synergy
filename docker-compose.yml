@@ -52,7 +52,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
-      EMBEDDINGS_SERVICE_URL: http://embeddings:8001
+      EMBEDDINGS_SERVICE__URL: http://embeddings:8001
     ports:
       - "8080:8080"
       - "5005:5005"  # Debug port
