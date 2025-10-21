@@ -214,11 +214,7 @@ const ListingsPage = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 {paginatedProducts.map((p) => (
-<<<<<<< HEAD
                   <Link key={p.id} to={`/listings/${p.id}`} className="card hover:shadow-md transition-shadow block">
-=======
-                  <Link key={p.id} to={`/listing/${p.id}`} className="card hover:shadow-md transition-shadow block">
->>>>>>> d63be99 (update frontend and fix product display with pagination)
                     <div className="relative">
                       <img 
                         src={p.imageUrl || 'https://placehold.co/300x200?text=No+Image'} 

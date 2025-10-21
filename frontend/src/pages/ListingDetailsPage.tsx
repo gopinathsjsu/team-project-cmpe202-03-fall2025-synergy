@@ -51,7 +51,7 @@ const ListingDetailsPage = () => {
           <p className="text-gray-600">Loading product details...</p>
         </div>
       </div>
-    )            //listingdetails
+    )            
   }
 
   if (error || !product) {
