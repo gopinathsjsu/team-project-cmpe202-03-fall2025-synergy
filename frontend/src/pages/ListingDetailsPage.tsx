@@ -63,11 +63,8 @@ const ListingDetailsPage = () => {
 
       setLoading(true)
       setError('')
-      
       try {
-        console.log('[ListingDetailsPage] Fetching product with ID:', id)
         const productData = await productApi.getById(Number(id))
-        console.log('[ListingDetailsPage] Product fetched:', productData)
         setProduct(productData)
       } catch (err: unknown) {
         console.error('[ListingDetailsPage] Error fetching product:', err)
@@ -94,7 +91,7 @@ const ListingDetailsPage = () => {
           <p className="text-gray-600">Loading product details...</p>
         </div>
       </div>
-    )            
+    )
   }
 
   if (error || !product) {
@@ -137,7 +134,6 @@ const ListingDetailsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Image and details */}
         <div className="lg:col-span-2">
           <div className="card mb-4">
             <img 
@@ -194,7 +190,6 @@ const ListingDetailsPage = () => {
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-4">
           <div className="card">
             <button 
@@ -207,7 +202,6 @@ const ListingDetailsPage = () => {
             <button 
               className="btn-secondary w-full flex items-center justify-center space-x-2"
               onClick={() => {
-                // TODO: Implement save/bookmark functionality
                 console.log('Save clicked')
               }}
             >
@@ -252,3 +246,4 @@ const ListingDetailsPage = () => {
 }
 
 export default ListingDetailsPage
+

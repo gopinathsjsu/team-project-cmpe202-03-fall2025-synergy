@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Search, SlidersHorizontal, Loader2 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
 import Pagination from '../components/Pagination'
@@ -8,7 +8,9 @@ import Pagination from '../components/Pagination'
 const ListingsPage = () => {
   // Filter state
   const [query, setQuery] = useState('')
-  const [category, setCategory] = useState('All')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const paramCategory = searchParams.get('category') ?? 'All'
+  const [category, setCategory] = useState(paramCategory)
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
   
@@ -82,6 +84,19 @@ const ListingsPage = () => {
   const endIndex = startIndex + pageSize
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
 
+  useEffect(() => {
+    setCategory(paramCategory)
+  }, [paramCategory])
+
+  const updateCategoryParam = (value: string) => {
+    setCategory(value)
+    if (value === 'All') {
+      setSearchParams({})
+    } else {
+      setSearchParams({ category: value })
+    }
+  }
+
   // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(0)
@@ -129,11 +144,19 @@ const ListingsPage = () => {
             </p>
           </div>
 
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center justify-between">
+              Category
+              <button
+                onClick={() => updateCategoryParam('All')}
+                className="text-xs text-primary-600 hover:text-primary-800"
+              >
+                All
+              </button>
+            </label>
             <select 
               value={category} 
-              onChange={(e) => setCategory(e.target.value)} 
+              onChange={(e) => updateCategoryParam(e.target.value)} 
               className="input-field"
             >
               {availableCategories.map((c) => (

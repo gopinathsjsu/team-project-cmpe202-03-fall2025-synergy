@@ -78,8 +78,9 @@ const HomePage = () => {
           {categories.map((category) => {
             const IconComponent = category.icon
             return (
-              <div
+              <Link
                 key={category.name}
+                to={`/listings?category=${encodeURIComponent(category.name)}`}
                 className="card hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="text-center">
@@ -88,7 +89,7 @@ const HomePage = () => {
                   </div>
                   <h3 className="font-medium text-gray-900">{category.name}</h3>
                 </div>
-              </div>
+              </Link>
             )
           })}
         </div>
