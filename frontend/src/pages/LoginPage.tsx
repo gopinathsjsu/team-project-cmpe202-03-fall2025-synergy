@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 const LoginPage = () => {
@@ -8,11 +8,21 @@ const LoginPage = () => {
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
+  const navigate = useNavigate()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement login logic
-    console.log('Login attempt:', formData)
+    if (!formData.email || !formData.password) return
+    if (formData.email === 'admin@campusmarket.com' && formData.password === 'admin123') {
+      localStorage.setItem('adminAuth', 'true')
+      localStorage.setItem('adminEmail', formData.email)
+      navigate('/admin')
+      return
+    }
+    // normal user fallback
+    localStorage.setItem('userAuth', 'true')
+    localStorage.setItem('userEmail', formData.email)
+    navigate('/')
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
