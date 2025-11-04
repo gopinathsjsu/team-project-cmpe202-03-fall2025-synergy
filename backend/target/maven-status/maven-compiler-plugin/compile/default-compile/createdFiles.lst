@@ -1,0 +1,7 @@
+com/example/app/controller/UserController.class
+com/example/app/model/User.class
+com/example/app/CampusMarketplaceApplication.class
+com/example/app/config/SecurityConfig.class
+com/example/app/service/UserService.class
+com/example/app/dto/UserDTO.class
+com/example/app/repository/UserRepository.class
