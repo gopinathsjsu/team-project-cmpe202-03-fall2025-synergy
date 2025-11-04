@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Search, Filter, BookOpen, Laptop, Home, Gamepad2 } from 'lucide-react'
+import { Search, Filter, BookOpen, Laptop, Home, Gamepad2, Loader2 } from 'lucide-react'
+import { productApi } from '../services/productApi'
+import type { Product } from '../services/productApi'
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -12,35 +14,25 @@ const HomePage = () => {
     { name: 'Gaming', icon: Gamepad2, color: 'bg-purple-100 text-purple-600' },
   ]
 
-  const featuredListings = [
-    {
-      id: 1,
-      title: 'Calculus Textbook - Stewart 8th Edition',
-      price: 45,
-      image: 'https://placehold.co/300x200?text=Calculus%20Textbook',
-      category: 'Textbooks',
-      seller: 'John Doe',
-      posted: '2 hours ago'
-    },
-    {
-      id: 2,
-      title: 'MacBook Pro 13" - 2020 Model',
-      price: 1200,
-      image: 'https://placehold.co/300x200?text=MacBook%20Pro',
-      category: 'Electronics',
-      seller: 'Jane Smith',
-      posted: '1 day ago'
-    },
-    {
-      id: 3,
-      title: 'Gaming Chair - Ergonomic',
-      price: 150,
-      image: 'https://placehold.co/300x200?text=Gaming%20Chair',
-      category: 'Furniture',
-      seller: 'Mike Johnson',
-      posted: '3 days ago'
-    },
-  ]
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([])
+  const [featuredLoading, setFeaturedLoading] = useState(false)
+  const [featuredError, setFeaturedError] = useState('')
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      setFeaturedLoading(true)
+      setFeaturedError('')
+      try {
+        const products = await productApi.getAll()
+        setFeaturedProducts(products)
+      } catch (err: any) {
+        setFeaturedError(err.response?.data?.error || err.message || 'Unable to load featured products.')
+      } finally {
+        setFeaturedLoading(false)
+      }
+    }
+    fetchFeatured()
+  }, [])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -104,27 +96,49 @@ const HomePage = () => {
             <span>Filter</span>
           </button>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredListings.map((listing) => (
-            <Link key={listing.id} to={`/listing/${listing.id}`} className="card hover:shadow-md transition-shadow cursor-pointer block">
-              <img
-                src={listing.image}
-                alt={listing.title}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-2">{listing.title}</h3>
-                <p className="text-2xl font-bold text-primary-600 mb-2">${listing.price}</p>
-                <div className="flex justify-between text-sm text-gray-500">
-                  <span>{listing.category}</span>
-                  <span>{listing.posted}</span>
+
+        {featuredLoading ? (
+          <div className="card flex items-center justify-center py-16">
+            <Loader2 className="h-10 w-10 animate-spin text-primary-600 mr-3" />
+            <span className="text-gray-600">Loading featured products...</span>
+          </div>
+        ) : featuredError ? (
+          <div className="card text-center py-10">
+            <p className="text-red-600">{featuredError}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featuredProducts.slice(0, 3).map((product) => (
+              <Link
+                key={product.id}
+                to={`/listings/${product.id}`}
+                className="card hover:shadow-md transition-shadow cursor-pointer block"
+              >
+                <img
+                  src={product.imageUrl || 'https://placehold.co/300x200?text=No+Image'}
+                  alt={product.name}
+                  className="w-full h-48 object-cover rounded-lg mb-4"
+                />
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
+                  <p className="text-2xl font-bold text-primary-600 mb-2">${product.price}</p>
+                  <div className="flex justify-between text-sm text-gray-500">
+                    <span>{product.category || 'Uncategorized'}</span>
+                    <span>{product.createdAt ? new Date(product.createdAt).toLocaleDateString() : ''}</span>
+                  </div>
+                  {product.description && (
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{product.description}</p>
+                  )}
                 </div>
-                <p className="text-sm text-gray-600 mt-2">Sold by {listing.seller}</p>
+              </Link>
+            ))}
+            {featuredProducts.length === 0 && (
+              <div className="card text-center py-8 text-gray-600">
+                No featured products available right now.
               </div>
-            </Link>
-          ))}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
