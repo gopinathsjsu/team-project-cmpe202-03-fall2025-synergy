@@ -1,5 +1,6 @@
 package com.example.app.dto;
 
+import com.example.app.model.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -22,6 +23,7 @@ public class UserDTO {
     
     private String firstName;
     private String lastName;
+    private UserStatus status;
     
     // Constructors
     public UserDTO() {}
@@ -32,6 +34,16 @@ public class UserDTO {
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.status = UserStatus.ACTIVE;
+    }
+    
+    public UserDTO(Long id, String username, String email, String firstName, String lastName, UserStatus status) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.status = status;
     }
     
     // Getters and Setters
@@ -81,5 +93,13 @@ public class UserDTO {
     
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    
+    public UserStatus getStatus() {
+        return status;
+    }
+    
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 }

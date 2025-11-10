@@ -1,6 +1,7 @@
 package com.example.app.service;
 
 import com.example.app.model.User;
+import com.example.app.model.UserStatus;
 import com.example.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,11 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
         
+        // Set default status to ACTIVE if not provided
+        if (user.getStatus() == null) {
+            user.setStatus(UserStatus.ACTIVE);
+        }
+        
         return userRepository.save(user);
     }
 
@@ -44,6 +50,11 @@ public class UserService {
         user.setEmail(userDetails.getEmail());
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
+        
+        // Update status if provided
+        if (userDetails.getStatus() != null) {
+            user.setStatus(userDetails.getStatus());
+        }
         
         return userRepository.save(user);
     }
@@ -59,5 +70,11 @@ public class UserService {
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+    
+    public User updateUserStatus(Long id, UserStatus status) {
+        User user = getUserById(id);
+        user.setStatus(status);
+        return userRepository.save(user);
     }
 }

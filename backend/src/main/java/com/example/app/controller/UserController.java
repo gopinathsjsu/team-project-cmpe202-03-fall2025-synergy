@@ -1,13 +1,14 @@
 package com.example.app.controller;
 
 import com.example.app.model.User;
+import com.example.app.model.UserStatus;
 import com.example.app.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -52,6 +53,21 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        String statusStr = request.get("status");
+        if (statusStr == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        try {
+            UserStatus status = UserStatus.valueOf(statusStr.toUpperCase());
+            User updatedUser = userService.updateUserStatus(id, status);
+            return ResponseEntity.ok(updatedUser);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+    
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("UserController is alive!");
