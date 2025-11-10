@@ -77,4 +77,12 @@ public class UserService {
         user.setStatus(status);
         return userRepository.save(user);
     }
+    
+    public long getTotalUserCount() {
+        return userRepository.count();
+    }
+    
+    public long getActiveUserCount() {
+        return userRepository.countByStatus(UserStatus.ACTIVE);
+    }
 }
