@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class UserController {
 
     @Autowired
@@ -54,18 +54,36 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
     @PatchMapping("/{id}/status")
-    public ResponseEntity<User> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    public ResponseEntity<?> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String statusStr = request.get("status");
-        if (statusStr == null) {
-            return ResponseEntity.badRequest().build();
+        if (statusStr == null || statusStr.trim().isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Status is required"));
         }
         try {
             UserStatus status = UserStatus.valueOf(statusStr.toUpperCase());
             User updatedUser = userService.updateUserStatus(id, status);
             return ResponseEntity.ok(updatedUser);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Invalid status. Must be ACTIVE or SUSPENDED"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         }
+    }
+    
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateUserStatusPut(@PathVariable Long id, @RequestBody Map<String, String> request) {
+        // Alias for PATCH endpoint for compatibility
+        return updateUserStatus(id, request);
+    }
+    
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Long>> getUserCount() {
+        long totalCount = userService.getTotalUserCount();
+        long activeCount = userService.getActiveUserCount();
+        return ResponseEntity.ok(Map.of("total", totalCount, "active", activeCount));
     }
     
     @GetMapping("/ping")
