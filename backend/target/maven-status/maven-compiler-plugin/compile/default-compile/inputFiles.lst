@@ -1,7 +1,7 @@
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/config/SecurityConfig.java
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/UserDTO.java
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/model/User.java
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/controller/UserController.java
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/CampusMarketplaceApplication.java
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/repository/UserRepository.java
-/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/service/UserService.java
+/app/src/main/java/com/example/app/model/User.java
+/app/src/main/java/com/example/app/CampusMarketplaceApplication.java
+/app/src/main/java/com/example/app/repository/UserRepository.java
+/app/src/main/java/com/example/app/service/UserService.java
+/app/src/main/java/com/example/app/config/SecurityConfig.java
+/app/src/main/java/com/example/app/dto/UserDTO.java
+/app/src/main/java/com/example/app/controller/UserController.java

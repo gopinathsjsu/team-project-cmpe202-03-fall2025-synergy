@@ -36,7 +36,7 @@ services:
     container_name: campus-marketplace-backend
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/campus_marketplace
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database-1.cs3oc0aoqhwx.us-east-1.rds.amazonaws.com:5432/campus_marketplace
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_REDIS_HOST: redis
@@ -45,7 +45,6 @@ services:
       - "8080:8080"
       - "5005:5005"  # Debug port
     depends_on:
-      - postgres
       - redis
     volumes:
       - ./backend:/app
