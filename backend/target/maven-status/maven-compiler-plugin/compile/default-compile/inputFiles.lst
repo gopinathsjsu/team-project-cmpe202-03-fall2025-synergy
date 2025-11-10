@@ -1,5 +1,7 @@
 /app/src/main/java/com/example/app/model/User.java
+/app/src/main/java/com/example/app/config/DataInitializer.java
 /app/src/main/java/com/example/app/CampusMarketplaceApplication.java
+/app/src/main/java/com/example/app/model/UserStatus.java
 /app/src/main/java/com/example/app/repository/UserRepository.java
 /app/src/main/java/com/example/app/service/UserService.java
 /app/src/main/java/com/example/app/config/SecurityConfig.java

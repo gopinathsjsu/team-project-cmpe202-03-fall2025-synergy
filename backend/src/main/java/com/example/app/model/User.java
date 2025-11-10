@@ -34,8 +34,14 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private UserStatus status = UserStatus.ACTIVE;
+    
     // Constructors
-    public User() {}
+    public User() {
+        this.status = UserStatus.ACTIVE;
+    }
     
     public User(String username, String email, String password, String firstName, String lastName) {
         this.username = username;
@@ -43,6 +49,16 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.status = UserStatus.ACTIVE;
+    }
+    
+    public User(String username, String email, String password, String firstName, String lastName, UserStatus status) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.status = status;
     }
     
     // Getters and Setters
@@ -92,5 +108,13 @@ public class User {
     
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    
+    public UserStatus getStatus() {
+        return status;
+    }
+    
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 }
