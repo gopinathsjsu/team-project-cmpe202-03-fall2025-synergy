@@ -1,0 +1,5 @@
+CREATE TABLE permissions (
+  id BIGSERIAL PRIMARY KEY,
+  role_id BIGINT REFERENCES roles(id) ON DELETE CASCADE,
+  page_id BIGINT REFERENCES pages(id) ON DELETE CASCADE
+);
