@@ -5,5 +5,6 @@
 /app/src/main/java/com/example/app/repository/UserRepository.java
 /app/src/main/java/com/example/app/service/UserService.java
 /app/src/main/java/com/example/app/config/SecurityConfig.java
+/app/src/main/java/com/example/app/controller/AdminController.java
 /app/src/main/java/com/example/app/dto/UserDTO.java
 /app/src/main/java/com/example/app/controller/UserController.java
