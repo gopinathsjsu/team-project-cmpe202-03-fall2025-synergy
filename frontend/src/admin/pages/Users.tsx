@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { adminApi, type BackendUser } from '../services/api'
+import { adminApi, type AdminUserRow } from '../services/api'
 import type { UserStatus } from '../services/mockData'
 
 // Frontend User interface for display
@@ -11,17 +11,24 @@ interface User {
 }
 
 // Helper function to map backend user to frontend user
-const mapBackendUserToFrontend = (backendUser: BackendUser): User => {
-  const fullName = [backendUser.firstName, backendUser.lastName]
-    .filter(Boolean)
+const normalizeStatus = (status?: string | null): UserStatus => {
+  const value = (status ?? 'ACTIVE').toUpperCase()
+  return value === 'SUSPENDED' ? 'SUSPENDED' : 'ACTIVE'
+}
+
+const mapBackendUserToFrontend = (backendUser: AdminUserRow): User => {
+  const fullName = [backendUser.first_name, backendUser.last_name]
+    .filter((part): part is string => Boolean(part && part.trim()))
     .join(' ')
-    .trim() || backendUser.username
-  
+    .trim()
+
+  const fallbackName = backendUser.username || backendUser.email || `User ${backendUser.id}`
+
   return {
     id: backendUser.id.toString(),
-    name: fullName,
-    email: backendUser.email,
-    status: backendUser.status,
+    name: fullName || fallbackName,
+    email: backendUser.email ?? '—',
+    status: normalizeStatus(backendUser.status),
   }
 }
 
@@ -42,9 +49,10 @@ export default function Users() {
       const backendUsers = await adminApi.getUserList()
       const mappedUsers = backendUsers.map(mapBackendUserToFrontend)
       setItems(mappedUsers)
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch users:', err)
-      setError('Failed to load users. Please try again.')
+      const message = err?.response?.data?.error || err?.message || 'Failed to load users. Please try again.'
+      setError(message)
     } finally {
       setLoading(false)
     }
