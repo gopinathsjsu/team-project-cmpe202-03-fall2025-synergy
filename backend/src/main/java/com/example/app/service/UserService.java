@@ -4,6 +4,7 @@ import com.example.app.model.User;
 import com.example.app.model.UserStatus;
 import com.example.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +15,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<User> getAllUsers() {
         return userRepository.findAll();
@@ -38,6 +42,11 @@ public class UserService {
         // Set default status to ACTIVE if not provided
         if (user.getStatus() == null) {
             user.setStatus(UserStatus.ACTIVE);
+        }
+        
+        // Hash password before saving
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
         
         return userRepository.save(user);
