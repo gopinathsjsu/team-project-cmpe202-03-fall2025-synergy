@@ -14,18 +14,18 @@ public class Messages {
     private Long Id;
 
     @Column(name = "chat_id", nullable = false)
-    private long chat_id;
+    private long chatId;
 
     @Column(name= "sender_id", nullable = false)
-    private long sender_id;
+    private long senderId;
 
     @Column(name="reciever_id", nullable = false)
-    private long reciever_id;
+    private long recieverId;
 
     @Column(name = "msg", nullable = false)
     private String msg;
 
-    @Column(name = "send_at", nullable = false)
+    @Column(name = "sent_at", nullable = false)
     private OffsetDateTime sent_at = OffsetDateTime.now();
 
     @Column(name = "updated_at")
@@ -39,22 +39,22 @@ public class Messages {
         Id = id;
     }
     public long getChatId() {
-        return chat_id;
+        return chatId;
     }
     public void setChatId(long chatId) {
-        this.chat_id = chatId;
+        this.chatId = chatId;
     }
     public long getSenderId() {
-        return sender_id;
+        return senderId;
     }
     public void setSenderId(long senderId) {
-        this.sender_id = senderId;
+        this.senderId = senderId;
     }
     public long getRecieverId() {
-        return reciever_id;
+        return recieverId;
     }
     public void setRecieverId(long recieverId) {
-        this.reciever_id = recieverId;
+        this.recieverId = recieverId;
     }
     public String getMsg() {
         return msg;

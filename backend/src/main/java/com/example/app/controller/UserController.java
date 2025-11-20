@@ -2,11 +2,15 @@ package com.example.app.controller;
 
 import com.example.app.model.User;
 import com.example.app.service.UserService;
+import com.example.app.service.ChatService;
+import com.example.app.dto.UserIdRequest;
+import com.example.app.dto.UserConversationsResponse;
+import com.example.app.dto.ConversationWithMessages;
+import com.example.app.model.Chat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -16,6 +20,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private ChatService chatService;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -45,5 +51,16 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/conversations")
+    public ResponseEntity<UserConversationsResponse> getUserConversations(@RequestBody UserIdRequest req) {
+        Long userId = req.getUser_id();
+        User user = userService.getUserById(userId);
+        List<Chat> chats = chatService.myConversations(userId);
+        List<ConversationWithMessages> convs = chats.stream()
+                .map(c -> new ConversationWithMessages(c, chatService.messages(c.getId())))
+                .toList();
+        return ResponseEntity.ok(new UserConversationsResponse(user, convs));
     }
 }

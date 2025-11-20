@@ -31,3 +31,4 @@ logging:
   level:
     com.example.app: DEBUG
     org.springframework.security: DEBUG
+    org.springframework.web: DEBUG

@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { ChatContext, type ChatContextValue, type Conversation, type Message } from "../context/chatContext";
+import { api, type UserConversationsResponse } from "../lib/api";
 
 // --- Dummy data ---
 const DUMMY_CONVERSATIONS: Conversation[] = [
@@ -37,6 +38,43 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     setConversations((prev) =>
       prev.map((c) => (c.id === id ? { ...c, unread: 0 } : c))
     );
+  };
+
+  const loadUserChats = async (userId: number) => {
+    try {
+      const res = await api.getUserConversations(userId);
+      // map conversations and messages
+      const convs: Conversation[] = res.conversations.map((cwm) => {
+        const chat = cwm.chat;
+        // pick the other user id to display
+        const otherId = (chat.buyerId === userId) ? chat.sellerId : chat.buyerId;
+        return {
+          id: Number(chat.id),
+          user: `User ${otherId}`,
+          lastMessage: cwm.messages.length ? cwm.messages[cwm.messages.length - 1].msg : "",
+          timestamp: cwm.messages.length ? (cwm.messages[cwm.messages.length - 1].sent_at ?? '') : '',
+          unread: 0,
+          avatar: `https://via.placeholder.com/40x40?text=U${otherId}`,
+        };
+      });
+
+      const msgs = res.conversations.flatMap((cwm) =>
+        cwm.messages.map((m) => ({
+          id: Number(m.id),
+          conversationId: Number(cwm.chat.id),
+          sender: (m.sender_id === userId) ? "You" : `User ${m.sender_id}`,
+          content: m.msg,
+          timestamp: m.sent_at ?? '',
+          isOwn: m.sender_id === userId,
+        }))
+      );
+
+      setConversations(convs);
+      setMessages(msgs);
+      setActiveChatId(convs[0]?.id ?? null);
+    } catch (err) {
+      console.error("Failed to load user chats", err);
+    }
   };
 
   const sendMessage = (text: string) => {
@@ -91,6 +129,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     activeChatId,
     selectConversation,
     sendMessage,
+    loadUserChats,
     scrollRef,
   };
 

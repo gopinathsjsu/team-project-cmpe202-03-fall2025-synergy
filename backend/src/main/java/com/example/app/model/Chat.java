@@ -1,77 +1,64 @@
 package com.example.app.model;
 
-import java.math.BigInteger;
 import java.time.OffsetDateTime;
-
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "chats", uniqueConstraints = @UniqueConstraint(columnNames = {"product_id","buyer_id","seller_id"}))
+@Table(
+  name = "chats",
+  uniqueConstraints = @UniqueConstraint(columnNames = {"product_id","buyer_id","seller_id"})
+)
 public class Chat {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @Column(name = "product_id", nullable = false)
-    private Long product_id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "buyer_id", nullable = false)
-    private Long buyer_id;
+  // Java property names (camelCase)
+  @Column(name = "product_id", nullable = false)
+  private Long productId;
 
-    @Column(name = "seller_id", nullable = false)
-    private Long seller_id;
+  @Column(name = "buyer_id", nullable = false)
+  private Long buyerId;
 
-    @Column(name = "cretaed_at", nullable = false)
-    private OffsetDateTime created_at = OffsetDateTime.now();
+  @Column(name = "seller_id", nullable = false)
+  private Long sellerId;
 
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime update_at = OffsetDateTime.now();
+  // Fix typos and align names
+  @Column(name = "create_audit_time", nullable = false)
+  private OffsetDateTime createdAt;
 
-    public Long getId() {
-        return id;
-    }
+  @Column(name = "update_audit_time", nullable = false)
+  private OffsetDateTime updatedAt;
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  @PrePersist
+  void onCreate() {
+    OffsetDateTime now = OffsetDateTime.now();
+    this.createdAt = now;
+    this.updatedAt = now;
+  }
 
-    public Long getProductId() {
-        return product_id;
-    }
+  @PreUpdate
+  void onUpdate() {
+    this.updatedAt = OffsetDateTime.now();
+  }
 
-    public void setProductId(Long productId) {
-        this.product_id = productId;
-    }
+  // getters/setters
+  public Long getId() { return id; }
+  public void setId(Long id) { this.id = id; }
 
-    public Long getBuyerId() {
-        return buyer_id;
-    }
+  public Long getProductId() { return productId; }
+  public void setProductId(Long productId) { this.productId = productId; }
 
-    public void setBuyerId(Long buyerId) {
-        this.buyer_id = buyerId;
-    }
+  public Long getBuyerId() { return buyerId; }
+  public void setBuyerId(Long buyerId) { this.buyerId = buyerId; }
 
-    public Long getSellerId() {
-        return seller_id;
-    }
+  public Long getSellerId() { return sellerId; }
+  public void setSellerId(Long sellerId) { this.sellerId = sellerId; }
 
-    public void setSellerId(Long sellerId) {
-        this.seller_id = sellerId;
-    }
+  public OffsetDateTime getCreatedAt() { return createdAt; }
+  public void setCreatedAt(OffsetDateTime createdAt) { this.createdAt = createdAt; }
 
-    public OffsetDateTime getCreatedAt() {
-        return created_at;
-    }
-
-    public void setCreatedAt(OffsetDateTime createdAt) {
-        this.created_at = createdAt;
-    }
-
-    public OffsetDateTime getUpdatedAt() {
-        return update_at;
-    }
-
-    public void setUpdatedAt(OffsetDateTime updatedAt) {
-        this.update_at = updatedAt;
-    }
+  public OffsetDateTime getUpdatedAt() { return updatedAt; }
+  public void setUpdatedAt(OffsetDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
