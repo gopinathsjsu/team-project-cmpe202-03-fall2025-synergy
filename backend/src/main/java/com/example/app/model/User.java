@@ -1,5 +1,6 @@
 package com.example.app.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -26,6 +27,7 @@ public class User {
     @NotBlank
     @Size(min = 6)
     @Column(name = "password")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     
     @Column(name = "first_name")
@@ -34,8 +36,14 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private UserStatus status = UserStatus.ACTIVE;
+    
     // Constructors
-    public User() {}
+    public User() {
+        this.status = UserStatus.ACTIVE;
+    }
     
     public User(String username, String email, String password, String firstName, String lastName) {
         this.username = username;
@@ -43,6 +51,16 @@ public class User {
         this.password = password;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.status = UserStatus.ACTIVE;
+    }
+    
+    public User(String username, String email, String password, String firstName, String lastName, UserStatus status) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.status = status;
     }
     
     // Getters and Setters
@@ -92,5 +110,13 @@ public class User {
     
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    
+    public UserStatus getStatus() {
+        return status;
+    }
+    
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 }

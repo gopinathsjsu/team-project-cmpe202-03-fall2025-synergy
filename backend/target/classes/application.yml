@@ -3,7 +3,7 @@ spring:
     name: campus-marketplace
   
   datasource:
-    url: jdbc:postgresql://localhost:5432/campus_marketplace
+    url: jdbc:postgresql://database-1.cs3oc0aoqhwx.us-east-1.rds.amazonaws.com:5432/campus_marketplace
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -31,4 +31,11 @@ logging:
   level:
     com.example.app: DEBUG
     org.springframework.security: DEBUG
+<<<<<<< HEAD
     org.springframework.web: DEBUG
+=======
+
+jwt:
+  secret: your-256-bit-secret-key-for-jwt-token-generation-must-be-at-least-32-characters-long
+  expiration: 86400000  # 24 hours in milliseconds
+>>>>>>> restore-main-69d5c28

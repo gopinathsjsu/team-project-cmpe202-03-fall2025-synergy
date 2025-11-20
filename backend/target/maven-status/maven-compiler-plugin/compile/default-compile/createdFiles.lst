@@ -1,19 +1,26 @@
+<<<<<<< HEAD
 com/example/app/dto/ConversationWithMessages.class
 com/example/app/dto/startChatRequest.class
 com/example/app/model/Messages.class
 com/example/app/model/Chat.class
+=======
+>>>>>>> restore-main-69d5c28
 com/example/app/model/User.class
 com/example/app/CampusMarketplaceApplication.class
 com/example/app/dto/MessageResponse.class
 com/example/app/repository/MessagesRepository.class
 com/example/app/repository/ChatRepository.class
 com/example/app/config/SecurityConfig.class
+<<<<<<< HEAD
 com/example/app/config/WebConfig.class
 com/example/app/controller/MessageController.class
 com/example/app/dto/StartMessageRequest.class
 com/example/app/controller/UserController.class
 com/example/app/service/ChatService.class
 com/example/app/dto/UserConversationsResponse.class
+=======
+com/example/app/controller/UserController.class
+>>>>>>> restore-main-69d5c28
 com/example/app/service/UserService.class
 com/example/app/controller/ChatController.class
 com/example/app/dto/UserIdRequest.class
