@@ -7,6 +7,8 @@ export interface Conversation {
   timestamp: string;
   unread: number;
   avatar: string;
+  otherUserId?: number; // Store the other user's ID for sending messages
+  messages?: Message[]; // Store messages for this conversation
 }
 
 export interface Message {
@@ -23,7 +25,7 @@ export interface ChatContextValue {
   activeConversation: Conversation | null;
   activeMessages: Message[];
   activeChatId: number | null;
-  selectConversation: (id: number) => void;
+  selectConversation: (id: number) => void | Promise<void>;
   sendMessage: (text: string) => void;
   loadUserChats?: (userId: number) => Promise<void>;
   // a ref the UI can use to auto-scroll to bottom
