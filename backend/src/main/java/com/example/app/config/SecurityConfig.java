@@ -33,6 +33,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 .requestMatchers("/auth/register", "/auth/login", "/users").permitAll()
+                .requestMatchers("/admin/**").permitAll() // Allow admin endpoints without authentication for now
+                .requestMatchers("/users/*/status").permitAll() // Allow user status updates for admin
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

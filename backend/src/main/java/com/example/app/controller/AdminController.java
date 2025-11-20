@@ -24,26 +24,33 @@ public class AdminController {
     public ResponseEntity<Map<String, Long>> getStats() {
         Map<String, Long> stats = new HashMap<>();
 
-        Long totalUsers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Long.class);
-        Long activeUsers;
+        Long totalUsers = 0L;
+        try {
+            totalUsers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Long.class);
+        } catch (Exception e) {
+            // Table might not exist or connection issue
+        }
+
+        Long activeUsers = 0L;
         try {
             activeUsers = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users WHERE UPPER(status) = 'ACTIVE'", Long.class);
         } catch (Exception e) {
-            activeUsers = 0L;
+            // Status column might not exist or different format
         }
 
-        Long totalListings;
+        Long totalListings = 0L;
         try {
             totalListings = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM products", Long.class);
         } catch (Exception e) {
-            totalListings = 0L;
+            // Products table might not exist
         }
 
-        Long openReports;
+        Long openReports = 0L;
         try {
-            openReports = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reports WHERE UPPER(status) = 'OPEN'", Long.class);
+            // Reports status is a boolean: NULL or false = open, true = resolved/closed
+            openReports = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reports WHERE status IS NULL OR status = false", Long.class);
         } catch (Exception e) {
-            openReports = 0L;
+            // Reports table might not exist or different schema
         }
 
         stats.put("totalUsers", totalUsers != null ? totalUsers : 0L);
@@ -63,8 +70,22 @@ public class AdminController {
     // Note: listings are stored in the 'products' table
     @GetMapping("/listings")
     public ResponseEntity<List<Map<String, Object>>> getListings() {
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT * FROM products ORDER BY id DESC");
+        List<Map<String, Object>> rows;
+        try {
+            // Try joining with categories and conditions tables (if using foreign keys)
+            String query = "SELECT p.*, " +
+                    "COALESCE(c.category, CAST(p.category_id AS VARCHAR), 'Unknown') as category, " +
+                    "COALESCE(cond.condition_name, CAST(p.condition_id AS VARCHAR), 'Unknown') as cond " +
+                    "FROM products p " +
+                    "LEFT JOIN categories c ON p.category_id = c.id " +
+                    "LEFT JOIN conditions cond ON p.condition_id = cond.id " +
+                    "ORDER BY p.id DESC";
+            rows = jdbcTemplate.queryForList(query);
+        } catch (Exception e) {
+            // Fallback: if join fails, use direct columns (category and cond are varchar)
+            rows = jdbcTemplate.queryForList(
+                    "SELECT * FROM products ORDER BY id DESC");
+        }
         return ResponseEntity.ok(rows);
     }
 

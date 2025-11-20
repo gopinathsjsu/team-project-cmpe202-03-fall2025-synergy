@@ -11,10 +11,6 @@ import com.example.app.model.Chat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-<<<<<<< HEAD
-=======
-import java.util.Arrays;
->>>>>>> restore-main-69d5c28
 
 import java.util.List;
 import java.util.Map;
@@ -64,7 +60,6 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-<<<<<<< HEAD
 
     @PostMapping("/conversations")
     public ResponseEntity<UserConversationsResponse> getUserConversations(@RequestBody UserIdRequest req) {
@@ -75,7 +70,8 @@ public class UserController {
                 .map(c -> new ConversationWithMessages(c, chatService.messages(c.getId())))
                 .toList();
         return ResponseEntity.ok(new UserConversationsResponse(user, convs));
-=======
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, String> request) {
         String statusStr = request.get("status");
@@ -112,6 +108,5 @@ public class UserController {
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("UserController is alive!");
->>>>>>> restore-main-69d5c28
     }
 }
