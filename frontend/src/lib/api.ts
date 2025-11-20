@@ -1,79 +1,111 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL as string;
+import axios from "axios";
+import type { MessageDTO, StartMessageRequestDTO, StartChatRequestDTO } from "../types/chat";
+import type { Conversation, Message } from "../context/chatContext";
+import { CURRENT_USER_ID } from "../types/chat";
 
-async function http<T> (path: string, options?:RequestInit):Promise<T>{
-    const res = await fetch(`${API_BASE_URL}${path}`, {
-        headers:{
-            'content-type': 'application/json'
-        },
-        ...options
-    });
-    if(!res.ok){
-        throw new Error(`HTTP error! status: ${res.status}`);
-    }else{
-        return res.json() as Promise<T>;
-    }
-}
+// Axios instance with baseURL
+const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8080/api",
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-export type Messages = {
-    id: number;
-    chat_id?: number; // backend uses snake_case
-    chatId?: number;  // frontend-friendly
-    sender_id?: number;
-    senderId?: number;
-    reciever_id?: number;
-    recieverId?: number;
-    msg: string;
-    sent_at?: string;
-    sentAt?: string;
-}
-
-export type startMessageRequest = {
-    chat_id: number;
-    reciever_id: number;
-    sender_id: number;
-    msg: string;
-}
-
-export type startChatRequest = {
-    buyer_id: number;
-    seller_id: number;
-    product_id: number;
-}
+// Legacy types for backward compatibility (if needed elsewhere)
+export type Messages = MessageDTO;
+export type startMessageRequest = StartMessageRequestDTO & { chat_id: number };
+export type startChatRequest = StartChatRequestDTO;
 
 export type Chat = {
-    id: number;
-    buyerId: number;
-    sellerId: number;
-    productId: number;
-    createdAt?: string;
-    updatedAt?: string;
-}; 
+  id: number;
+  buyerId: number;
+  sellerId: number;
+  productId: number;
+  createdAt?: string;
+  updatedAt?: string;
+};
 
 export type ConversationWithMessages = {
-    chat: Chat;
-    messages: Messages[];
-}
+  chat: Chat;
+  messages: Messages[];
+};
 
 export type UserConversationsResponse = {
-    user: { id: number; username: string; email: string; firstName?: string; lastName?: string };
-    conversations: ConversationWithMessages[];
+  user: { id: number; username: string; email: string; firstName?: string; lastName?: string };
+  conversations: ConversationWithMessages[];
+};
+
+/**
+ * Get all messages for a chat
+ */
+export async function getMessages(chatId: number): Promise<Message[]> {
+  const response = await apiClient.get<any[]>(`/chat/${chatId}/message`);
+  // Map backend response (camelCase) to Message[]
+  return response.data.map((m: any): Message => ({
+    id: m.id,
+    conversationId: m.chatId ?? chatId,
+    sender: m.senderId === CURRENT_USER_ID ? "You" : "Seller",
+    content: m.msg,
+    timestamp: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    isOwn: m.senderId === CURRENT_USER_ID,
+  }));
 }
 
+/**
+ * Send a message in a chat
+ */
+export async function sendMessage(
+  chatId: number,
+  body: StartMessageRequestDTO
+): Promise<Message[]> {
+  const response = await apiClient.post<any>(`/chat/${chatId}/message`, body);
+  // Map backend response to Message[]
+  const messages = response.data.messages || [];
+  return messages.map((m: any): Message => ({
+    id: m.id,
+    conversationId: m.chatId ?? chatId,
+    sender: m.senderId === CURRENT_USER_ID ? "You" : "Seller",
+    content: m.msg,
+    timestamp: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    isOwn: m.senderId === CURRENT_USER_ID,
+  }));
+}
+
+/**
+ * Start a new chat (optional)
+ */
+export async function startChat(body: StartChatRequestDTO): Promise<Chat> {
+  const response = await apiClient.post<Chat>(`/chat/start`, body);
+  return response.data;
+}
+
+// Legacy API object for backward compatibility
 export const api = {
-    listMessages: (chatId: number) => http<Messages[]>(`chat/${chatId}/message`),
-
-    sendMessages: (chatId: number, body: startMessageRequest ) => http<{chat_id: number, messages: Messages[]}>(`chat/${chatId}/message`, {
-        method: 'POST',
-        body: JSON.stringify(body)
-    }),
-
-    startChat: (body: startChatRequest) => http<Chat>(`chat/start`, {
-        method: 'POST',
-        body: JSON.stringify(body)
-    }),
-
-    getUserConversations: (userId: number) => http<UserConversationsResponse>(`users/conversations`, {
-        method: 'POST',
-        body: JSON.stringify({ user_id: 10 })
-    })
-}
+  listMessages: getMessages,
+  sendMessages: sendMessage,
+  startChat,
+  getUserConversations: async (): Promise<Conversation[]> => {
+    const response = await apiClient.post(`/users/conversations`, {
+      user_id: CURRENT_USER_ID,
+    });
+    
+    const data = response.data;
+    return data.conversations.map((conv: any) => ({
+      id: conv.chat.id,
+      user: conv.chat.sellerId === CURRENT_USER_ID ? "Buyer" : "Seller",
+      lastMessage: conv.messages?.at(-1)?.msg || "",
+      timestamp: conv.messages?.at(-1)?.sentAt || conv.chat.createdAt,
+      unread: 0,
+      avatar: "https://via.placeholder.com/40x40?text=CM",
+      otherUserId: conv.chat.sellerId === CURRENT_USER_ID ? conv.chat.buyerId : conv.chat.sellerId,
+      messages: conv.messages?.map((m: any): Message => ({
+        id: m.id,
+        conversationId: m.chatId,
+        sender: m.senderId === CURRENT_USER_ID ? "You" : "Seller",
+        content: m.msg,
+        timestamp: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        isOwn: m.senderId === CURRENT_USER_ID,
+      })) || [],
+    }));
+  },
+};

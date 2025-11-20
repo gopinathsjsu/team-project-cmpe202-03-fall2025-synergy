@@ -1,125 +1,248 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect, useCallback } from "react";
 import { ChatContext, type ChatContextValue, type Conversation, type Message } from "../context/chatContext";
-import { api, type UserConversationsResponse } from "../lib/api";
-
-// --- Dummy data ---
-const DUMMY_CONVERSATIONS: Conversation[] = [
-  { id: 1, user: "John Doe",  lastMessage: "Is the textbook still available?", timestamp: "2 min ago", unread: 2, avatar: "https://via.placeholder.com/40x40?text=JD" },
-  { id: 2, user: "Jane Smith", lastMessage: "What's the condition of the laptop?", timestamp: "1 hour ago", unread: 0, avatar: "https://via.placeholder.com/40x40?text=JS" },
-  { id: 3, user: "Mike Johnson", lastMessage: "Thanks for the quick response!", timestamp: "3 hours ago", unread: 0, avatar: "https://via.placeholder.com/40x40?text=MJ" },
-];
-
-const DUMMY_MESSAGES: Message[] = [
-  { id: 1, conversationId: 1, sender: "John Doe", content: "Hi! Is the Calculus textbook still available?", timestamp: "2:30 PM", isOwn: false },
-  { id: 2, conversationId: 1, sender: "You",      content: "Yes, it's still available! It's in great condition.", timestamp: "2:32 PM", isOwn: true },
-  { id: 3, conversationId: 1, sender: "John Doe", content: "Perfect! What's the lowest price you can do?", timestamp: "2:35 PM", isOwn: false },
-  { id: 4, conversationId: 1, sender: "You",      content: "I can do $40 if you can pick it up today.", timestamp: "2:36 PM", isOwn: true },
-];
+import { getMessages, api } from "../lib/api";
+import { formatRelativeTime, CURRENT_USER_ID, DEFAULT_SELLER_ID } from "../types/chat";
+import { useInterval } from "../hooks/useInterval";
+import { Toast } from "../components/Toast";
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
-  const [conversations, setConversations] = useState<Conversation[]>(DUMMY_CONVERSATIONS);
-  const [messages, setMessages] = useState<Message[]>(DUMMY_MESSAGES);
-  const [activeChatId, setActiveChatId] = useState<number | null>(DUMMY_CONVERSATIONS[0]?.id ?? null);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ message: string; type?: "error" | "success" | "info" } | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Track last seen message ID per chat to avoid double-counting unread
+  const lastSeenMessageIds = useRef<Map<number, number>>(new Map());
 
   const activeConversation = useMemo(
     () => conversations.find((c) => c.id === activeChatId) ?? null,
     [conversations, activeChatId]
   );
 
-  const activeMessages = useMemo(
-    () => messages.filter((m) => m.conversationId === activeChatId),
-    [messages, activeChatId]
+  const activeMessages = useMemo(() => {
+    const filtered = messages.filter((m) => m.conversationId === activeChatId);
+    // Sort by id ascending (oldest → newest)
+    return filtered.sort((a, b) => a.id - b.id);
+  }, [messages, activeChatId]);
+
+  // Auto-scroll to bottom when messages update
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [activeMessages]);
+
+  // Load messages for active chat
+  const loadMessagesForChat = useCallback(async (chatId: number) => {
+    try {
+      const uiMessages = await getMessages(chatId);
+      
+      // Update messages: remove old messages for this chat, add new ones
+      setMessages((prev) => {
+        const otherChatMessages = prev.filter((m) => m.conversationId !== chatId);
+        return [...otherChatMessages, ...uiMessages];
+      });
+
+      // Update conversation's lastMessage if there are new messages
+      if (uiMessages.length > 0) {
+        const latestMessage = uiMessages[uiMessages.length - 1];
+        const isFromOtherUser = !latestMessage.isOwn;
+        const isActiveChat = chatId === activeChatId;
+        const lastSeenId = lastSeenMessageIds.current.get(chatId) ?? 0;
+        const isNewMessage = latestMessage.id > lastSeenId;
+        
+        // Update last seen message ID
+        lastSeenMessageIds.current.set(chatId, latestMessage.id);
+        
+        setConversations((prev) =>
+          prev.map((c) => {
+            if (c.id !== chatId) return c;
+            
+            // Increment unread only if it's a new message from other user and chat is not active
+            const newUnread = isNewMessage && isFromOtherUser && !isActiveChat 
+              ? c.unread + 1 
+              : c.unread;
+            
+            return {
+              ...c,
+              lastMessage: latestMessage.content,
+              timestamp: formatRelativeTime(new Date().toISOString()), // Use current time as fallback
+              unread: newUnread,
+              messages: uiMessages, // Update messages in conversation
+            };
+          })
+        );
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to load messages";
+      setToast({ message: errorMessage, type: "error" });
+      console.error("Failed to load messages:", error);
+    }
+  }, [activeChatId]);
+
+  // Poll for new messages in active chat (every 5 seconds)
+  useInterval(
+    () => {
+      if (activeChatId) {
+        loadMessagesForChat(activeChatId);
+      }
+    },
+    activeChatId ? 5000 : null
   );
 
-  const selectConversation = (id: number) => {
+  // Load conversations on mount
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const userConvs = await api.getUserConversations();
+        setConversations(userConvs);
+        if (userConvs.length > 0) {
+          setActiveChatId(userConvs[0].id);
+          setMessages(userConvs[0].messages || []);
+        }
+      } catch (error) {
+        console.error("Failed to load conversations:", error);
+        setToast({ message: "Failed to load conversations", type: "error" });
+      }
+    };
+    fetchConversations();
+  }, []);
+
+  // Load messages when activeChatId changes
+  useEffect(() => {
+    if (activeChatId) {
+      loadMessagesForChat(activeChatId);
+    }
+  }, [activeChatId, loadMessagesForChat]);
+
+  const selectConversation = async (id: number) => {
     setActiveChatId(id);
+    // Mark as read and update last seen message ID
+    const chatMessages = messages.filter((m) => m.conversationId === id);
+    if (chatMessages.length > 0) {
+      const lastMessageId = Math.max(...chatMessages.map((m) => m.id));
+      lastSeenMessageIds.current.set(id, lastMessageId);
+    }
     setConversations((prev) =>
       prev.map((c) => (c.id === id ? { ...c, unread: 0 } : c))
     );
-  };
-
-  const loadUserChats = async (userId: number) => {
-    try {
-      const res = await api.getUserConversations(userId);
-      // map conversations and messages
-      const convs: Conversation[] = res.conversations.map((cwm) => {
-        const chat = cwm.chat;
-        // pick the other user id to display
-        const otherId = (chat.buyerId === userId) ? chat.sellerId : chat.buyerId;
-        return {
-          id: Number(chat.id),
-          user: `User ${otherId}`,
-          lastMessage: cwm.messages.length ? cwm.messages[cwm.messages.length - 1].msg : "",
-          timestamp: cwm.messages.length ? (cwm.messages[cwm.messages.length - 1].sent_at ?? '') : '',
-          unread: 0,
-          avatar: `https://via.placeholder.com/40x40?text=U${otherId}`,
-        };
+    
+    // Load messages if not already loaded
+    const conv = conversations.find(c => c.id === id);
+    if (conv?.messages && conv.messages.length > 0) {
+      setMessages((prev) => {
+        const otherChatMessages = prev.filter((m) => m.conversationId !== id);
+        return [...otherChatMessages, ...conv.messages!];
       });
-
-      const msgs = res.conversations.flatMap((cwm) =>
-        cwm.messages.map((m) => ({
-          id: Number(m.id),
-          conversationId: Number(cwm.chat.id),
-          sender: (m.sender_id === userId) ? "You" : `User ${m.sender_id}`,
-          content: m.msg,
-          timestamp: m.sent_at ?? '',
-          isOwn: m.sender_id === userId,
-        }))
-      );
-
-      setConversations(convs);
-      setMessages(msgs);
-      setActiveChatId(convs[0]?.id ?? null);
-    } catch (err) {
-      console.error("Failed to load user chats", err);
+    } else {
+      // Fetch messages from API
+      try {
+        const res = await api.listMessages(id);
+        setMessages((prev) => {
+          const otherChatMessages = prev.filter((m) => m.conversationId !== id);
+          return [...otherChatMessages, ...res];
+        });
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+      }
     }
   };
 
-  const sendMessage = (text: string) => {
+  const loadUserChats = async (_userId: number) => {
+    try {
+      const userConvs = await api.getUserConversations();
+      setConversations(userConvs);
+      
+      // Collect all messages from conversations
+      const allMessages: Message[] = userConvs.flatMap((conv) => conv.messages || []);
+      setMessages(allMessages);
+      
+      // Initialize last seen message IDs
+      userConvs.forEach((conv) => {
+        if (conv.messages && conv.messages.length > 0) {
+          const lastMessageId = Math.max(...conv.messages.map((m: Message) => m.id));
+          lastSeenMessageIds.current.set(conv.id, lastMessageId);
+        }
+      });
+      
+      // Set first conversation as active if none is active
+      if (!activeChatId && userConvs.length > 0) {
+        setActiveChatId(userConvs[0].id);
+        if (userConvs[0].messages && userConvs[0].messages.length > 0) {
+          setMessages(userConvs[0].messages);
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to load conversations";
+      setToast({ message: errorMessage, type: "error" });
+      console.error("Failed to load user chats:", error);
+    }
+  };
+
+  const sendMessage = async (text: string) => {
     if (!text.trim() || !activeChatId) return;
 
-    const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    const activeConv = conversations.find((c) => c.id === activeChatId);
+    if (!activeConv) return;
 
-    const newMsg: Message = {
+    // Get receiver_id from conversation's otherUserId, fallback to DEFAULT_SELLER_ID
+    const receiverId = activeConv.otherUserId || DEFAULT_SELLER_ID;
+
+    const previousMessages = [...messages];
+
+    // Optimistic update: add message immediately
+    const optimisticMsg: Message = {
       id: Date.now(),
       conversationId: activeChatId,
       sender: "You",
       content: text.trim(),
-      timestamp: time,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       isOwn: true,
     };
-
-    setMessages((prev) => [...prev, newMsg]);
-
+    setMessages((prev) => [...prev, optimisticMsg]);
     setConversations((prev) =>
       prev.map((c) =>
-        c.id === activeChatId ? { ...c, lastMessage: newMsg.content, timestamp: "Just now" } : c
+        c.id === activeChatId
+          ? { ...c, lastMessage: optimisticMsg.content, timestamp: "Just now" }
+          : c
       )
     );
 
-    // mock reply after 1s
-    const replySender = conversations.find((c) => c.id === activeChatId)?.user ?? "Seller";
-    setTimeout(() => {
-      const reply: Message = {
-        id: Date.now() + 1,
-        conversationId: activeChatId,
-        sender: replySender,
-        content: "Got it! Can do $42?",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        isOwn: false,
-      };
-      setMessages((prev) => [...prev, reply]);
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === activeChatId
-            ? { ...c, lastMessage: reply.content, timestamp: "Just now" }
-            : c
-        )
-      );
-    }, 1000);
+    try {
+      // Send to API
+      const updated = await api.sendMessages(activeChatId, {
+        chat_id: activeChatId,
+        sender_id: CURRENT_USER_ID,
+        reciever_id: receiverId,
+        msg: text.trim(),
+      });
+
+      // Replace optimistic message with server response
+      setMessages((prev) => {
+        const otherChatMessages = prev.filter((m) => m.conversationId !== activeChatId);
+        return [...otherChatMessages, ...updated];
+      });
+
+      // Update conversation with latest message
+      if (updated.length > 0) {
+        const latest = updated[updated.length - 1];
+        // Update last seen message ID
+        lastSeenMessageIds.current.set(activeChatId, latest.id);
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === activeChatId
+              ? { ...c, lastMessage: latest.content, timestamp: "Just now" }
+              : c
+          )
+        );
+      }
+    } catch (err) {
+      // Roll back optimistic message
+      setMessages(previousMessages);
+      console.error("Send failed:", err);
+      setToast({ message: "Failed to send message", type: "error" });
+    }
   };
 
   const value: ChatContextValue = {
@@ -133,7 +256,18 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     scrollRef,
   };
 
-  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+  return (
+    <>
+      <ChatContext.Provider value={value}>{children}</ChatContext.Provider>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </>
+  );
 }
 
 export default ChatProvider;
