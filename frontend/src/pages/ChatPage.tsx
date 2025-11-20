@@ -10,6 +10,7 @@ const ChatPage = () => {
     activeChatId,
     selectConversation,
     sendMessage,
+    loadUserChats,
     scrollRef,
   } = useChat();
 
@@ -39,8 +40,21 @@ const ChatPage = () => {
         <div className="flex h-96 border border-gray-200 rounded-lg overflow-hidden">
           {/* Conversations List */}
           <div className="w-1/3 border-r border-gray-200 bg-gray-50">
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="font-medium text-gray-900">Conversations</h3>
+              <div className="flex items-center space-x-2">
+                <input id="userId" placeholder="user id" className="input-field w-20" />
+                <button
+                  className="btn-primary"
+                  onClick={() => {
+                    const el = document.getElementById('userId') as HTMLInputElement | null;
+                    const v = el?.value ? Number(el.value) : NaN;
+                    if (!isNaN(v) && loadUserChats) loadUserChats(v);
+                  }}
+                >
+                  Load
+                </button>
+              </div>
             </div>
             <div className="overflow-y-auto">
               {conversations.map((conversation) => (
