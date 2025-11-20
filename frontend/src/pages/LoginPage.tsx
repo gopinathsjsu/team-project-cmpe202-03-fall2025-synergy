@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { authApi } from '../services/authApi'
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -8,21 +9,67 @@ const LoginPage = () => {
     password: ''
   })
   const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  
+  // Get the page the user was trying to access before being redirected to login
+  const from = (location.state as any)?.from?.pathname || '/'
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const isAuthenticated = token && localStorage.getItem('userAuth') === 'true'
+    if (isAuthenticated) {
+      navigate(from, { replace: true })
+    }
+  }, [navigate, from])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.email || !formData.password) return
+    setError('')
+
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields')
+      return
+    }
+
+    // Check for admin login (keep this for admin panel)
     if (formData.email === 'admin@campusmarket.com' && formData.password === 'admin123') {
       localStorage.setItem('adminAuth', 'true')
       localStorage.setItem('adminEmail', formData.email)
       navigate('/admin')
       return
     }
-    // normal user fallback
-    localStorage.setItem('userAuth', 'true')
-    localStorage.setItem('userEmail', formData.email)
-    navigate('/')
+
+    setLoading(true)
+    try {
+      const response = await authApi.login({
+        usernameOrEmail: formData.email,
+        password: formData.password,
+      })
+
+      // Store token and user info
+      localStorage.setItem('token', response.token)
+      localStorage.setItem('userAuth', 'true')
+      localStorage.setItem('userId', response.id.toString())
+      localStorage.setItem('username', response.username)
+      localStorage.setItem('userEmail', response.email)
+      if (response.firstName) localStorage.setItem('firstName', response.firstName)
+      if (response.lastName) localStorage.setItem('lastName', response.lastName)
+
+      // Trigger login event for Navbar update
+      window.dispatchEvent(new Event('userLogin'))
+
+      // Redirect to the page they were trying to access, or home page
+      navigate(from, { replace: true })
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Login failed. Please check your credentials.')
+      console.error('Login error:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +93,12 @@ const LoginPage = () => {
             </Link>
           </p>
         </div>
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -118,9 +171,10 @@ const LoginPage = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign in
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>

@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
+import { authApi } from '../services/authApi'
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -8,15 +9,72 @@ const RegisterPage = () => {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    username: ''
   })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [error, setError] = useState<string>('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    const isAuthenticated = token && localStorage.getItem('userAuth') === 'true'
+    if (isAuthenticated) {
+      navigate('/', { replace: true })
+    }
+  }, [navigate])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Implement registration logic
-    console.log('Registration attempt:', formData)
+    setError('')
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match')
+      return
+    }
+
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters')
+      return
+    }
+
+    // Generate username from email if not provided
+    const username = formData.username || formData.email.split('@')[0]
+
+    setLoading(true)
+    try {
+      const response = await authApi.register({
+        username,
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      })
+
+      // Store token and user info
+      localStorage.setItem('token', response.token)
+      localStorage.setItem('userAuth', 'true')
+      localStorage.setItem('userId', response.id.toString())
+      localStorage.setItem('username', response.username)
+      localStorage.setItem('userEmail', response.email)
+      if (response.firstName) localStorage.setItem('firstName', response.firstName)
+      if (response.lastName) localStorage.setItem('lastName', response.lastName)
+
+      // Trigger login event for Navbar update
+      window.dispatchEvent(new Event('userLogin'))
+
+      // Redirect to home page
+      navigate('/')
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Registration failed. Please try again.')
+      console.error('Registration error:', err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +98,12 @@ const RegisterPage = () => {
             </Link>
           </p>
         </div>
+        
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
         
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -81,6 +145,25 @@ const RegisterPage = () => {
                   />
                 </div>
               </div>
+            </div>
+            
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
+              </label>
+              <div className="mt-1 relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={handleChange}
+                  className="input-field pl-10"
+                  placeholder="Choose a username (optional)"
+                />
+              </div>
+              <p className="mt-1 text-xs text-gray-500">If not provided, username will be generated from email</p>
             </div>
             
             <div>
@@ -178,9 +261,10 @@ const RegisterPage = () => {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Create Account
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </div>
         </form>

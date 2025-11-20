@@ -10,6 +10,7 @@ import ListingDetailsPage from './pages/ListingDetailsPage'
 import ListingsPage from './pages/ListingsPage'
 import Navbar from './components/Navbar'
 import AdminApp from './admin/App'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function InnerApp() {
   const location = useLocation()
@@ -19,14 +20,61 @@ function InnerApp() {
       {!isAdmin && <Navbar />}
       <main>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/listings" element={<ListingsPage />} />
-          <Route path="/create-listing" element={<CreateListingPage />} />
-          <Route path="/chat" element={<ChatPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/listing/:id" element={<ListingDetailsPage />} />
+          
+          {/* Protected routes - require authentication */}
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/listings" 
+            element={
+              <ProtectedRoute>
+                <ListingsPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/create-listing" 
+            element={
+              <ProtectedRoute>
+                <CreateListingPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/chat" 
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/listing/:id" 
+            element={
+              <ProtectedRoute>
+                <ListingDetailsPage />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Admin routes */}
           <Route path="/admin/*" element={<AdminApp />} />
         </Routes>
       </main>
