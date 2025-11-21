@@ -85,6 +85,7 @@ function normalizeProduct(product: Product): Product {
     matchPercentage: product.matchPercentage || product.match_percentage,
     match_percentage: product.match_percentage || product.matchPercentage,
   }
+
 }
 
 // Spring Data JPA Page response format
@@ -117,6 +118,7 @@ export type PaginatedResponse<T> = {
   totalPages: number
   first: boolean
   last: boolean
+
 }
 
 export const productApi = {

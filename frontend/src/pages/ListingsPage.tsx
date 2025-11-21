@@ -230,6 +230,7 @@ const ListingsPage = () => {
               )}
             </div>
           ) : (
+<<<<<<< HEAD
             <>
               <div className="mb-4 text-sm text-gray-600">
                 Showing {startIndex + 1} to {Math.min(endIndex, totalElements)} of {totalElements} products
@@ -271,6 +272,35 @@ const ListingsPage = () => {
                 />
               )}
             </>
+=======
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filtered.map((p) => (
+                <Link key={p.id} to={`/listing/${p.id}`} className="card hover:shadow-md transition-shadow block">
+                  <div className="relative">
+                    <img 
+                      src={p.imageUrl || 'https://placehold.co/300x200?text=No+Image'} 
+                      alt={p.name} 
+                      className="w-full h-48 object-cover rounded-lg mb-4" 
+                    />
+                    {p.matchPercentage !== undefined && p.matchPercentage !== null && query.trim() && (
+                      <div className="absolute top-2 right-2 bg-primary-600 text-white px-2 py-1 rounded-md text-xs font-semibold">
+                        {p.matchPercentage.toFixed(1)}% match
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{p.name}</h3>
+                  <p className="text-2xl font-bold text-primary-600">${p.price}</p>
+                  <div className="flex justify-between text-sm text-gray-500 mt-2">
+                    <span>{p.category || 'Uncategorized'}</span>
+                    {p.condition && <span>{p.condition}</span>}
+                  </div>
+                  {p.description && (
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{p.description}</p>
+                  )}
+                </Link>
+              ))}
+            </div>
+>>>>>>> 7a79e50 (sematic serach implementation)
           )}
         </section>
       </div>

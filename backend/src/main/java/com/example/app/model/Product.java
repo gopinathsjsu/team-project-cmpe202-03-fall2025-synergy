@@ -55,6 +55,9 @@ public class Product {
     @Transient
     private Double matchPercentage; // Match percentage for search results (not persisted)
     
+    @Transient
+    private Double matchPercentage; // Match percentage for search results (not persisted)
+    
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
