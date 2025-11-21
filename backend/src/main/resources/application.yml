@@ -38,3 +38,7 @@ logging:
 jwt:
   secret: your-256-bit-secret-key-for-jwt-token-generation-must-be-at-least-32-characters-long
   expiration: 86400000  # 24 hours in milliseconds
+
+embeddings:
+  service:
+    url: http://localhost:8001

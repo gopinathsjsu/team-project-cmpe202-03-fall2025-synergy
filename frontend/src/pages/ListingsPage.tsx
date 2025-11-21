@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useMarketPlaceContext } from '../context/marketPlaceContext'
+import { productApi } from '../services/productApi'
+import type { Product } from '../services/productApi'
 
 // type Listing = {
 //   id: number
@@ -28,18 +29,53 @@ const ListingsPage = () => {
   const [category, setCategory] = useState('All')
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string>('')
 
-  const { listings } = useMarketPlaceContext()
+  // Debounce search query
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      performSearch()
+    }, 500) // Wait 500ms after user stops typing
+
+    return () => clearTimeout(timeoutId)
+  }, [query])
+
+  // Load products on mount
+  useEffect(() => {
+    performSearch()
+  }, [])
+
+  const performSearch = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      let results: Product[]
+      if (query.trim()) {
+        // Use semantic search when there's a query
+        results = await productApi.search(query.trim(), 50)
+      } else {
+        // Get all active products when no query
+        results = await productApi.getActive()
+      }
+      setProducts(results)
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to load products')
+      console.error('Search error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filtered = useMemo(() => {
-    return listings.filter((l) => {
-      const matchesQuery = l.title.toLowerCase().includes(query.toLowerCase())
-      const matchesCategory = category === 'All' || l.category === category
-      const minOk = minPrice ? l.price >= Number(minPrice) : true
-      const maxOk = maxPrice ? l.price <= Number(maxPrice) : true
-      return matchesQuery && matchesCategory && minOk && maxOk
+    return products.filter((p) => {
+      const matchesCategory = category === 'All' || p.category === category
+      const minOk = minPrice ? Number(p.price) >= Number(minPrice) : true
+      const maxOk = maxPrice ? Number(p.price) <= Number(maxPrice) : true
+      return matchesCategory && minOk && maxOk
     })
-  }, [query, category, minPrice, maxPrice])
+  }, [products, category, minPrice, maxPrice])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -100,21 +136,37 @@ const ListingsPage = () => {
 
         {/* Results */}
         <section className="lg:col-span-3">
-          {filtered.length === 0 ? (
+          {error && (
+            <div className="card bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+          {loading ? (
+            <div className="card text-center py-16">
+              <p className="text-gray-600">Searching...</p>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="card text-center py-16">
               <p className="text-gray-600">No results. Try adjusting search or filters.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filtered.map((l) => (
-                <Link key={l.id} to={`/listing/${l.id}`} className="card hover:shadow-md transition-shadow block">
-                  <img src={l.image} alt={l.title} className="w-full h-48 object-cover rounded-lg mb-4" />
-                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{l.title}</h3>
-                  <p className="text-2xl font-bold text-primary-600">${l.price}</p>
+              {filtered.map((p) => (
+                <Link key={p.id} to={`/listing/${p.id}`} className="card hover:shadow-md transition-shadow block">
+                  <img 
+                    src={p.imageUrl || 'https://placehold.co/300x200?text=No+Image'} 
+                    alt={p.name} 
+                    className="w-full h-48 object-cover rounded-lg mb-4" 
+                  />
+                  <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">{p.name}</h3>
+                  <p className="text-2xl font-bold text-primary-600">${p.price}</p>
                   <div className="flex justify-between text-sm text-gray-500 mt-2">
-                    <span>{l.category}</span>
-                    <span>{l.posted}</span>
+                    <span>{p.category || 'Uncategorized'}</span>
+                    {p.condition && <span>{p.condition}</span>}
                   </div>
+                  {p.description && (
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{p.description}</p>
+                  )}
                 </Link>
               ))}
             </div>

@@ -28,6 +28,17 @@ services:
     networks:
       - campus-network
 
+  # Embeddings Service (Python FastAPI)
+  embeddings:
+    build:
+      context: ./embeddings-service
+      dockerfile: Dockerfile
+    container_name: campus-marketplace-embeddings
+    ports:
+      - "8001:8001"
+    networks:
+      - campus-network
+
   # Backend API (Spring Boot)
   backend:
     build:
@@ -41,11 +52,13 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       SPRING_REDIS_HOST: redis
       SPRING_REDIS_PORT: 6379
+      EMBEDDINGS_SERVICE_URL: http://embeddings:8001
     ports:
       - "8080:8080"
       - "5005:5005"  # Debug port
     depends_on:
       - redis
+      - embeddings
     volumes:
       - ./backend:/app
       - maven_cache:/root/.m2
