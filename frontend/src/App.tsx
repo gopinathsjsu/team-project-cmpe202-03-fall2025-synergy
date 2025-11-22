@@ -59,12 +59,13 @@ function InnerApp() {
             } 
           />
           <Route 
+            path="/listings/:id" 
+            element={<ListingDetailsPage />} 
+          />
+          {/* Legacy route for backward compatibility */}
+          <Route 
             path="/listing/:id" 
-            element={
-              <ProtectedRoute>
-                <ListingDetailsPage />
-              </ProtectedRoute>
-            } 
+            element={<ListingDetailsPage />} 
           />
           
           {/* Admin routes */}

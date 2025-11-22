@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -48,11 +49,24 @@ public class ProductController {
     
     /**
      * Get product by ID
+     * GET /api/products/{id}
      */
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        Product product = productService.getProductById(id);
-        return ResponseEntity.ok(product);
+        logger.info("GET /api/products/{} - Fetching product by ID", id);
+        try {
+            Optional<Product> product = productRepository.findById(id);
+            if (product.isPresent()) {
+                logger.info("Product found: {}", product.get().getName());
+                return ResponseEntity.ok(product.get());
+            } else {
+                logger.warn("Product not found with ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching product by ID: {}", id, e);
+            return ResponseEntity.status(500).build();
+        }
     }
     
     /**
