@@ -33,27 +33,30 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
-<<<<<<< HEAD
+                // Auth & user/product/listing endpoints
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/users/**").permitAll()
                 .requestMatchers("/products/**").permitAll()
                 .requestMatchers("/listings/**").permitAll()
+
+                // Admin & error endpoints
                 .requestMatchers("/admin/**").permitAll()
                 .requestMatchers("/error").permitAll()
-                .anyRequest().permitAll() // Changed from authenticated() to permitAll() for now
-=======
+
+                // Specific auth/user endpoints from merged branch
                 .requestMatchers("/auth/register", "/auth/login", "/users").permitAll()
-                .requestMatchers("/admin/**").permitAll() // Allow admin endpoints without authentication for now
-                .requestMatchers("/users/*/status").permitAll() // Allow user status updates for admin
-                // Chat endpoints - permitAll for development (TODO: add proper auth when login is integrated)
-                .requestMatchers("/users/conversations").permitAll()
-                .requestMatchers("/chat/start").permitAll()
-                .requestMatchers("/chat/**/message").permitAll()
-                .anyRequest().authenticated()
->>>>>>> 5f6b69b (Integration with products page)
+                .requestMatchers("/users/*/status").permitAll()
+
+                // Chat endpoints (require authentication)
+                .requestMatchers("/users/conversations").authenticated()
+                .requestMatchers("/chat/start").authenticated()
+                .requestMatchers("/chat/*/message").authenticated()
+
+                // For now allow everything else (you can change to authenticated() later)
+                .anyRequest().permitAll()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 
@@ -79,7 +82,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

@@ -1,14 +1,13 @@
 package com.example.app.controller;
 
+import com.example.app.dto.*;
 import com.example.app.model.User;
 import com.example.app.model.UserStatus;
 import com.example.app.model.Messages;
 import com.example.app.service.UserService;
 import com.example.app.service.ChatService;
-import com.example.app.dto.UserIdRequest;
-import com.example.app.dto.UserConversationsResponse;
-import com.example.app.dto.ConversationWithMessages;
-import com.example.app.dto.ChatDTO;
+import com.example.app.util.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +25,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private ChatService chatService;
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
@@ -136,5 +137,120 @@ public class UserController {
     @GetMapping("/ping")
     public ResponseEntity<String> ping() {
         return ResponseEntity.ok("UserController is alive!");
+    }
+    
+    /**
+     * Get current user profile
+     * GET /api/users/me
+     * Requires authentication via JWT token in Authorization header
+     */
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUserProfile(@RequestHeader("Authorization") String authHeader) {
+        try {
+            // Extract token from Authorization header
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Missing or invalid Authorization header"));
+            }
+            
+            String token = authHeader.substring(7);
+            
+            // Validate token
+            if (!jwtUtil.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid or expired token"));
+            }
+            
+            // Extract user ID from token
+            Long userId = jwtUtil.extractUserId(token);
+            
+            // Fetch user from database
+            User user = userService.getUserById(userId);
+            
+            // Convert to DTO (exclude password)
+            UserProfileDto profile = new UserProfileDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getStatus()
+            );
+            
+            return ResponseEntity.ok(profile);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to retrieve profile: " + e.getMessage()));
+        }
+    }
+    
+    /**
+     * Update current user profile
+     * PUT /api/users/me
+     * Requires authentication via JWT token in Authorization header
+     */
+    @PutMapping("/me")
+    public ResponseEntity<?> updateCurrentUserProfile(
+            @RequestHeader("Authorization") String authHeader,
+            @Valid @RequestBody UpdateUserProfileRequest request) {
+        try {
+            // Extract token from Authorization header
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Missing or invalid Authorization header"));
+            }
+            
+            String token = authHeader.substring(7);
+            
+            // Validate token
+            if (!jwtUtil.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid or expired token"));
+            }
+            
+            // Extract user ID from token
+            Long userId = jwtUtil.extractUserId(token);
+            
+            // Fetch existing user from database
+            User user = userService.getUserById(userId);
+            
+            // Update only the allowed fields
+            user.setFirstName(request.getFirstName());
+            user.setLastName(request.getLastName());
+            
+            // Only update email if provided and different
+            if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
+                // Check if new email is already taken by another user
+                if (userService.existsByEmail(request.getEmail())) {
+                    return ResponseEntity.badRequest()
+                            .body(Map.of("error", "Email is already in use"));
+                }
+                user.setEmail(request.getEmail());
+            }
+            
+            // Save updated user
+            User updatedUser = userService.updateUser(userId, user);
+            
+            // Convert to DTO and return
+            UserProfileDto profile = new UserProfileDto(
+                updatedUser.getId(),
+                updatedUser.getUsername(),
+                updatedUser.getEmail(),
+                updatedUser.getFirstName(),
+                updatedUser.getLastName(),
+                updatedUser.getStatus()
+            );
+            
+            return ResponseEntity.ok(profile);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update profile: " + e.getMessage()));
+        }
     }
 }

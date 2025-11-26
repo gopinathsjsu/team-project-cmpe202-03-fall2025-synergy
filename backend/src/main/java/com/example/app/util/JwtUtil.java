@@ -62,6 +62,24 @@ public class JwtUtil {
         return createToken(claims, username);
     }
     
+    public String generateToken(String username, Long userId, String email, String firstName, String lastName) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", userId);
+        claims.put("email", email);
+        claims.put("firstName", firstName);
+        claims.put("lastName", lastName);
+        return createToken(claims, username);
+    }
+    
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        Object userIdObj = claims.get("userId");
+        if (userIdObj instanceof Integer) {
+            return ((Integer) userIdObj).longValue();
+        }
+        return (Long) userIdObj;
+    }
+    
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)

@@ -17,6 +17,15 @@ const apiClient = axios.create({
   },
 });
 
+// Add JWT token to all requests
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Legacy types for backward compatibility (if needed elsewhere)
 export type Messages = MessageDTO;
 export type startMessageRequest = StartMessageRequestDTO & { chat_id: number };
@@ -61,25 +70,45 @@ export type UserConversationsResponse = {
   conversations: ConversationWithMessages[];
 };
 
+interface ServerMessage {
+  id: number;
+  chatId?: number;
+  chat_id?: number;
+  senderId?: number;
+  sender_id?: number;
+  recieverId?: number;
+  reciever_id?: number;
+  msg: string;
+  sentAt?: string;
+  sent_at?: string;
+}
+
 /**
  * Helper to map server message to UI Message
+ * Uses actual logged-in user ID from localStorage
  */
-function mapServerMessage(m: any): Message {
+function mapServerMessage(m: ServerMessage, currentUserId: number): Message {
+  const senderId = m.senderId ?? m.sender_id ?? 0;
+  const chatId = m.chatId ?? m.chat_id ?? 0;
+  const sentAt = m.sentAt ?? m.sent_at ?? new Date().toISOString();
+  const isOwn = senderId === currentUserId;
+  
   return {
     id: m.id,
-    conversationId: m.chatId,
-    sender: m.senderId === CURRENT_USER_ID ? "You" : "Seller",
+    conversationId: chatId,
+    sender: isOwn ? "You" : `User ${senderId}`,
     content: m.msg,
-    timestamp: new Date(m.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    isOwn: m.senderId === CURRENT_USER_ID,
+    timestamp: new Date(sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+    isOwn,
   };
 }
 
 /**
  * Helper to map array of server messages to UI Messages
+ * Uses actual logged-in user ID from localStorage
  */
-function mapServerMessages(list: any[]): Message[] {
-  return (list || []).map(mapServerMessage);
+function mapServerMessages(list: ServerMessage[], currentUserId: number): Message[] {
+  return (list || []).map((m) => mapServerMessage(m, currentUserId));
 }
 
 /**
@@ -106,11 +135,21 @@ export function toConversationFromStart(resp: StartChatResponse, currentUserId: 
 /**
  * Get all messages for a chat
  * Backend: GET /api/chat/{chatId}/message
+ * Returns: MessageDTO[] directly (array of messages)
  */
 export async function getMessages(chatId: number): Promise<Message[]> {
   try {
-    const res = await apiClient.get<any>(`/chat/${chatId}/message`);
-    return mapServerMessages(res.data?.messages ?? res.data ?? []);
+    const res = await apiClient.get<ServerMessage[]>(`/chat/${chatId}/message`);
+    const data = res.data;
+    
+    // Backend returns MessageDTO[] directly
+    const messages: ServerMessage[] = Array.isArray(data) ? data : [];
+    
+    // Get current user ID from localStorage
+    const storedId = Number(localStorage.getItem("userId"));
+    const currentUserId = Number.isFinite(storedId) && storedId > 0 ? storedId : CURRENT_USER_ID;
+    
+    return mapServerMessages(messages, currentUserId);
   } catch (error) {
     console.error(`Failed to get messages for chat ${chatId}:`, error);
     throw error;
@@ -120,16 +159,32 @@ export async function getMessages(chatId: number): Promise<Message[]> {
 /**
  * Send a message in a chat
  * Backend: POST /api/chat/{chatId}/message
- * Body: { sender_id, reciever_id, msg }
+ * Body: { receiver_id, msg } (sender_id is derived from JWT on backend)
+ * Returns: MessageResponse with all messages for the chat
  */
 export async function sendMessage(
   chatId: number,
-  payload: { sender_id: number; reciever_id: number; msg: string }
+  payload: { receiver_id: number; msg: string }
 ): Promise<Message[]> {
   try {
-    const res = await apiClient.post<any>(`/chat/${chatId}/message`, payload);
-    // backend returns all messages of the chat; map them:
-    return mapServerMessages(res.data?.messages ?? res.data ?? []);
+    // Backend expects { receiver_id, msg } - sender_id comes from JWT
+    const res = await apiClient.post<{ chatId: number; messages: ServerMessage[] } | ServerMessage[]>(`/chat/${chatId}/message`, payload);
+    
+    // Backend returns MessageResponse { chatId, messages } or directly MessageDTO[]
+    const data = res.data;
+    let messages: ServerMessage[] = [];
+    
+    if (Array.isArray(data)) {
+      messages = data;
+    } else if (data && typeof data === 'object' && 'messages' in data) {
+      messages = (data as { messages: ServerMessage[] }).messages ?? [];
+    }
+    
+    // Get current user ID from localStorage
+    const storedId = Number(localStorage.getItem("userId"));
+    const currentUserId = Number.isFinite(storedId) && storedId > 0 ? storedId : CURRENT_USER_ID;
+    
+    return mapServerMessages(messages, currentUserId);
   } catch (error) {
     console.error(`Failed to send message in chat ${chatId}:`, error);
     throw error;
@@ -146,8 +201,9 @@ export async function startChat(body: StartChatRequestDTO): Promise<StartChatRes
   try {
     const res = await apiClient.post<StartChatResponse>("/chat/start", body);
     return res.data;
-  } catch (error: any) {
-    const errorMessage = error.response?.data?.error || error.message || "Failed to start chat";
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { error?: string } }; message?: string };
+    const errorMessage = err.response?.data?.error || err.message || "Failed to start chat";
     console.error("Failed to start chat:", errorMessage, error);
     throw new Error(errorMessage);
   }
@@ -163,15 +219,34 @@ export const api = {
    * Backend: POST /api/users/conversations
    * Body: { user_id: number }
    */
-  getUserConversations: async (): Promise<any> => {
-    try {
-      const response = await apiClient.post(`/users/conversations`, { user_id: CURRENT_USER_ID });
-      return response.data;
-    } catch (error) {
-      console.error("Failed to get user conversations:", error);
-      throw error;
-    }
-  },
+//   getUserConversations: async (): Promise<UserConversationsResponse> => {
+//     try {
+//       const response = await apiClient.post<UserConversationsResponse>(`/users/conversations`, { user_id: CURRENT_USER_ID });
+//       return response.data;
+//     } catch (error) {
+//       console.error("Failed to get user conversations:", error);
+//       throw error;
+//     }
+//   },
+    getUserConversations: async (): Promise<UserConversationsResponse> => {
+      try {
+        // Prefer the logged-in user's id from localStorage
+        const storedId = Number(localStorage.getItem("userId"));
+        const userId = Number.isFinite(storedId) && storedId > 0
+          ? storedId
+          : CURRENT_USER_ID; // fallback for safety
+
+        const response = await apiClient.post<UserConversationsResponse>(
+          `/users/conversations`,
+          { user_id: userId }
+        );
+
+        return response.data;
+      } catch (error) {
+        console.error("Failed to get user conversations:", error);
+        throw error;
+      }
+    },
   // Legacy aliases for backward compatibility
   listMessages: getMessages,
   sendMessages: sendMessage,

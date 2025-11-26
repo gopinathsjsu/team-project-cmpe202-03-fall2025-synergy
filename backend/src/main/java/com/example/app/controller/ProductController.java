@@ -1,8 +1,10 @@
 package com.example.app.controller;
 
+import com.example.app.dto.ProductResponseDto;
 import com.example.app.model.Product;
 import com.example.app.repository.ProductRepository;
 import com.example.app.service.ProductService;
+import com.example.app.util.ProductMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/products")
@@ -31,20 +34,25 @@ public class ProductController {
      * GET /api/products
      */
     @GetMapping
-    public List<Product> getAllProducts() {
+    public List<ProductResponseDto> getAllProducts() {
         logger.info("GET /api/products - Fetching all products from database");
         List<Product> products = productRepository.findAll();
         logger.info("Returning {} products", products.size());
-        return products;
+        return products.stream()
+                .map(ProductMapper::toResponseDto)
+                .collect(Collectors.toList());
     }
     
     /**
      * Get active products
      */
     @GetMapping("/active")
-    public ResponseEntity<List<Product>> getActiveProducts() {
+    public ResponseEntity<List<ProductResponseDto>> getActiveProducts() {
         List<Product> products = productService.getActiveProducts();
-        return ResponseEntity.ok(products);
+        List<ProductResponseDto> dtos = products.stream()
+                .map(ProductMapper::toResponseDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
     
     /**
@@ -52,13 +60,13 @@ public class ProductController {
      * GET /api/products/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponseDto> getProductById(@PathVariable Long id) {
         logger.info("GET /api/products/{} - Fetching product by ID", id);
         try {
             Optional<Product> product = productRepository.findById(id);
             if (product.isPresent()) {
                 logger.info("Product found: {}", product.get().getName());
-                return ResponseEntity.ok(product.get());
+                return ResponseEntity.ok(ProductMapper.toResponseDto(product.get()));
             } else {
                 logger.warn("Product not found with ID: {}", id);
                 return ResponseEntity.notFound().build();
@@ -79,7 +87,10 @@ public class ProductController {
             @RequestParam(required = false) Integer limit) {
         try {
             List<Product> products = productService.searchProducts(q, limit);
-            return ResponseEntity.ok(products);
+            List<ProductResponseDto> dtos = products.stream()
+                    .map(ProductMapper::toResponseDto)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(Map.of("error", "Search failed: " + e.getMessage()));
@@ -90,9 +101,12 @@ public class ProductController {
      * Get products by category
      */
     @GetMapping("/category/{category}")
-    public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable String category) {
+    public ResponseEntity<List<ProductResponseDto>> getProductsByCategory(@PathVariable String category) {
         List<Product> products = productService.getProductsByCategory(category);
-        return ResponseEntity.ok(products);
+        List<ProductResponseDto> dtos = products.stream()
+                .map(ProductMapper::toResponseDto)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
     
     /**
@@ -102,7 +116,7 @@ public class ProductController {
     public ResponseEntity<?> createProduct(@RequestBody Product product) {
         try {
             Product createdProduct = productService.createProduct(product);
-            return ResponseEntity.ok(createdProduct);
+            return ResponseEntity.ok(ProductMapper.toResponseDto(createdProduct));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Failed to create product: " + e.getMessage()));
@@ -116,7 +130,7 @@ public class ProductController {
     public ResponseEntity<?> updateProduct(@PathVariable Long id, @RequestBody Product product) {
         try {
             Product updatedProduct = productService.updateProduct(id, product);
-            return ResponseEntity.ok(updatedProduct);
+            return ResponseEntity.ok(ProductMapper.toResponseDto(updatedProduct));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", e.getMessage()));

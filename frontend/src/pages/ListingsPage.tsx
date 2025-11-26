@@ -31,8 +31,9 @@ const ListingsPage = () => {
         const products = await productApi.getAll()
         console.log('[ListingsPage] Received products:', products.length)
         setAllProducts(products)
-      } catch (err: any) {
-        const errorMessage = err.response?.data?.error || err.message || 'Failed to load products'
+      } catch (err: unknown) {
+        const error = err as { response?: { data?: { error?: string } }; message?: string };
+        const errorMessage = error.response?.data?.error || error.message || 'Failed to load products'
         console.error('[ListingsPage] Error fetching products:', err)
         setError(errorMessage)
         setAllProducts([])

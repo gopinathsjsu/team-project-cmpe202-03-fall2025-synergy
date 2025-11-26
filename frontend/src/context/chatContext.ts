@@ -27,7 +27,7 @@ export interface ChatContextValue {
   activeChatId: number | null;
   selectConversation: (id: number) => void | Promise<void>;
   sendMessage: (text: string) => void;
-  loadUserChats?: (userId: number) => Promise<void>;
+  loadUserChats?: () => Promise<void>;  // No userId parameter - uses current user
   // a ref the UI can use to auto-scroll to bottom
   scrollRef: React.RefObject<HTMLDivElement | null>;
 }

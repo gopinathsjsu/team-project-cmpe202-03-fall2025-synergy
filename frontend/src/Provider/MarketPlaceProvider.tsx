@@ -71,16 +71,16 @@ export function MarketPlaceProvider({ children }: { children: React.ReactNode })
   const [listings, setListings] = useState<Listing[]>(DUMMY_LISTINGS);
   const [filters, setFilters] = useState<Filters>({});
 
-  const fetchListings = async (params: Record<string, unknown> = {}) => {
+  const fetchListings = React.useCallback(async (params: Record<string, unknown> = {}) => {
     try {
       const res = await axios.get<Listing[]>("/api/listings", { params });
       setListings(res.data);
     } catch (e) {
       console.error("Failed to fetch listings:", e);
     }
-  };
+  }, []);
 
-  const getListingById = (id?: string) => (id ? listings.find(l => l.id === id) ?? null : null);
+  const getListingById = React.useCallback((id?: string) => (id ? listings.find(l => l.id === id) ?? null : null), [listings]);
 
   const value = useMemo<MarketPlaceContextValue>(() => ({
     listings,
@@ -88,7 +88,7 @@ export function MarketPlaceProvider({ children }: { children: React.ReactNode })
     setFilters,
     getListingById,
     fetchListings
-  }), [listings, filters]);
+  }), [listings, filters, getListingById, fetchListings]);
 
   return (
     <MarketPlaceContext.Provider value={value}>

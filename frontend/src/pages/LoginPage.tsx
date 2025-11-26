@@ -15,7 +15,7 @@ const LoginPage = () => {
   const location = useLocation()
   
   // Get the page the user was trying to access before being redirected to login
-  const from = (location.state as any)?.from?.pathname || '/'
+  const from = (location.state as { from?: { pathname?: string } })?.from?.pathname || '/'
   
   // Redirect if already logged in
   useEffect(() => {
@@ -64,8 +64,9 @@ const LoginPage = () => {
 
       // Redirect to the page they were trying to access, or home page
       navigate(from, { replace: true })
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed. Please check your credentials.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || 'Login failed. Please check your credentials.')
       console.error('Login error:', err)
     } finally {
       setLoading(false)

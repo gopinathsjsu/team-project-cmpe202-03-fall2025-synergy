@@ -18,7 +18,6 @@ export function Avatar({ name, className = "w-10 h-10" }: { name: string; classN
   };
 
   const initials = getInitials(name);
-  const bgColor = `bg-primary-${(name.charCodeAt(0) || 0) % 6 + 1}00`;
 
   return (
     <div

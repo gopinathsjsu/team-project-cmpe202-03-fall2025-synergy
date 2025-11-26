@@ -36,9 +36,10 @@ export default function Listings() {
       setError(null)
       const data = await adminApi.getListings()
       setItems(data.map(mapListing))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load listings:', err)
-      const message = err?.response?.data?.error || err?.message || 'Failed to load listings. Please try again.'
+      const error = err as { response?: { data?: { error?: string } }; message?: string };
+      const message = error?.response?.data?.error || error?.message || 'Failed to load listings. Please try again.'
       setError(message)
     } finally {
       setLoading(false)

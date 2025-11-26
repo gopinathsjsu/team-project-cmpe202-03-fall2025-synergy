@@ -94,4 +94,12 @@ public class UserService {
     public long getActiveUserCount() {
         return userRepository.countByStatus(UserStatus.ACTIVE);
     }
+    
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+    
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }

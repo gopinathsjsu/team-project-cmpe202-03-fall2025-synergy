@@ -17,6 +17,13 @@ const ChatPage = () => {
 
   const [message, setMessage] = useState("");
 
+  // Load chats on mount
+  useEffect(() => {
+    if (loadUserChats) {
+      loadUserChats();
+    }
+  }, [loadUserChats]);
+
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -43,19 +50,16 @@ const ChatPage = () => {
           <div className="w-1/3 border-r border-gray-200 bg-gray-50">
             <div className="p-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="font-medium text-gray-900">Conversations</h3>
-              <div className="flex items-center space-x-2">
-                <input id="userId" placeholder="user id" className="input-field w-20" />
-                <button
-                  className="btn-primary"
-                  onClick={() => {
-                    const el = document.getElementById('userId') as HTMLInputElement | null;
-                    const v = el?.value ? Number(el.value) : NaN;
-                    if (!isNaN(v) && loadUserChats) loadUserChats(v);
-                  }}
-                >
-                  Load
-                </button>
-              </div>
+              <button
+                className="btn-primary text-sm px-3 py-1"
+                onClick={() => {
+                  if (loadUserChats) {
+                    loadUserChats();
+                  }
+                }}
+              >
+                Refresh
+              </button>
             </div>
             <div className="overflow-y-auto">
               {conversations.length === 0 ? (

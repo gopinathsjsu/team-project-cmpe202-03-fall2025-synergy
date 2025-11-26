@@ -48,8 +48,14 @@ public class AuthenticationService {
         // Save user
         User savedUser = userRepository.save(user);
         
-        // Generate JWT token
-        String token = jwtUtil.generateToken(savedUser.getUsername(), savedUser.getId());
+        // Generate JWT token with full user details
+        String token = jwtUtil.generateToken(
+            savedUser.getUsername(), 
+            savedUser.getId(),
+            savedUser.getEmail(),
+            savedUser.getFirstName(),
+            savedUser.getLastName()
+        );
         
         // Return auth response
         return new AuthResponse(
@@ -85,8 +91,14 @@ public class AuthenticationService {
             throw new RuntimeException("Invalid username/email or password");
         }
         
-        // Generate JWT token
-        String token = jwtUtil.generateToken(user.getUsername(), user.getId());
+        // Generate JWT token with full user details
+        String token = jwtUtil.generateToken(
+            user.getUsername(), 
+            user.getId(),
+            user.getEmail(),
+            user.getFirstName(),
+            user.getLastName()
+        );
         
         // Return auth response
         return new AuthResponse(

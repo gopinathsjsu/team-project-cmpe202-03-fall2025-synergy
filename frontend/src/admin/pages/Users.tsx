@@ -49,9 +49,10 @@ export default function Users() {
       const backendUsers = await adminApi.getUserList()
       const mappedUsers = backendUsers.map(mapBackendUserToFrontend)
       setItems(mappedUsers)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to fetch users:', err)
-      const message = err?.response?.data?.error || err?.message || 'Failed to load users. Please try again.'
+      const error = err as { response?: { data?: { error?: string } }; message?: string };
+      const message = error?.response?.data?.error || error?.message || 'Failed to load users. Please try again.'
       setError(message)
     } finally {
       setLoading(false)
@@ -83,10 +84,11 @@ export default function Users() {
       await fetchUsers()
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000)
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to update user status:', err)
-      const errorMessage = err?.response?.data?.error || 
-                          err?.message || 
+      const error = err as { response?: { data?: { error?: string } }; message?: string };
+      const errorMessage = error?.response?.data?.error || 
+                          error?.message || 
                           'Failed to update user status. Please try again.'
       setError(errorMessage)
       // Clear error message after 5 seconds
@@ -118,7 +120,7 @@ export default function Users() {
           <select
             className="border rounded px-2 py-1"
             value={statusFilter}
-            onChange={e => setStatusFilter(e.target.value as any)}
+            onChange={e => setStatusFilter(e.target.value as 'ALL' | 'ACTIVE' | 'SUSPENDED')}
           >
             <option value="ALL">All</option>
             <option value="ACTIVE">Active</option>

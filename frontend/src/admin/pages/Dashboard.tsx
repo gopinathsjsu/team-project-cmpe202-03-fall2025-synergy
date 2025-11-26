@@ -13,9 +13,10 @@ export default function Dashboard() {
         const result = await adminApi.getAdminStats()
         setStats(result)
         setError(null)
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to fetch admin stats:', err)
-        const message = err?.response?.data?.error || 'Failed to load stats. Please try again.'
+        const error = err as { response?: { data?: { error?: string } } };
+        const message = error?.response?.data?.error || 'Failed to load stats. Please try again.'
         setError(message)
       } finally {
         setLoading(false)

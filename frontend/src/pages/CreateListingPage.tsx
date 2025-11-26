@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Upload, X, DollarSign, Tag, FileText } from 'lucide-react'
+import { Upload, X, DollarSign, Tag } from 'lucide-react'
 import { productApi } from '../services/productApi'
 
 const CreateListingPage = () => {
@@ -101,13 +101,14 @@ const CreateListingPage = () => {
       }
 
       // Call API to create product
-      const createdProduct = await productApi.create(productData)
+      await productApi.create(productData)
       
       // Success - redirect to listings page or product detail page
       navigate(`/listings`, { replace: true })
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error creating listing:', err)
-      setError(err.response?.data?.error || 'Failed to create listing. Please try again.')
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || 'Failed to create listing. Please try again.')
     } finally {
       setLoading(false)
     }

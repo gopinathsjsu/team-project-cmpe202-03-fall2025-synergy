@@ -42,6 +42,9 @@ api.interceptors.response.use(
   }
 )
 
+/**
+ * Product type matching backend ProductResponseDto (snake_case JSON)
+ */
 export type Product = {
   id: number
   name: string
@@ -49,12 +52,39 @@ export type Product = {
   price: number
   category?: string
   condition?: string
+  seller_id?: number  // Backend uses snake_case
+  image_url?: string  // Backend uses snake_case
+  status?: string
+  created_at?: string  // Backend uses snake_case
+  updated_at?: string  // Backend uses snake_case
+  match_percentage?: number  // Backend uses snake_case
+  
+  // Legacy camelCase fields (computed from snake_case)
   sellerId?: number
   imageUrl?: string
-  status?: string
   createdAt?: string
   updatedAt?: string
-  matchPercentage?: number // Match percentage for search results (0-100)
+  matchPercentage?: number
+}
+
+/**
+ * Normalize product to have both snake_case and camelCase properties
+ */
+function normalizeProduct(product: Product): Product {
+  return {
+    ...product,
+    // Ensure both naming conventions are available
+    sellerId: product.sellerId || product.seller_id,
+    seller_id: product.seller_id || product.sellerId,
+    imageUrl: product.imageUrl || product.image_url,
+    image_url: product.image_url || product.imageUrl,
+    createdAt: product.createdAt || product.created_at,
+    created_at: product.created_at || product.createdAt,
+    updatedAt: product.updatedAt || product.updated_at,
+    updated_at: product.updated_at || product.updatedAt,
+    matchPercentage: product.matchPercentage || product.match_percentage,
+    match_percentage: product.match_percentage || product.matchPercentage,
+  }
 }
 
 // Spring Data JPA Page response format
@@ -117,11 +147,12 @@ export const productApi = {
         count: response.data?.length || 0
       })
       return response.data
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { message?: string; response?: { status?: number }; config?: { url?: string } };
       console.error('[productApi] ❌ Error fetching all products:', {
-        message: error.message,
-        status: error.response?.status,
-        url: error.config?.url
+        message: err.message,
+        status: err.response?.status,
+        url: err.config?.url
       })
       throw error
     }
@@ -129,17 +160,17 @@ export const productApi = {
 
   getById: async (id: number): Promise<Product> => {
     const response = await api.get<Product>(`/products/${id}`)
-    return response.data
+    return normalizeProduct(response.data)
   },
 
   getByCategory: async (category: string): Promise<Product[]> => {
     const response = await api.get<Product[]>(`/products/category/${category}`)
-    return response.data
+    return response.data.map(normalizeProduct)
   },
 
   create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
     const response = await api.post<Product>('/products', product)
-    return response.data
+    return normalizeProduct(response.data)
   },
 
   /**
@@ -182,29 +213,35 @@ export const productApi = {
       }
       
       return paginatedResponse
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { 
+        message?: string; 
+        code?: string; 
+        response?: { status?: number; statusText?: string; data?: unknown }; 
+        config?: { url?: string; method?: string } 
+      };
       const errorDetails = {
-        message: error.message,
-        code: error.code,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        responseData: error.response?.data,
-        requestUrl: error.config?.url,
-        requestMethod: error.config?.method,
+        message: err.message,
+        code: err.code,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        responseData: err.response?.data,
+        requestUrl: err.config?.url,
+        requestMethod: err.config?.method,
         fullUrl: fullUrl,
         baseURL: api.defaults.baseURL
       }
       console.error('[productApi] ❌ Error fetching listings:', errorDetails)
       
       // Provide more helpful error messages
-      if (error.response?.status === 404) {
+      if (err.response?.status === 404) {
         throw new Error(`Endpoint not found: ${fullUrl}. Make sure the backend is running and the endpoint exists.`)
-      } else if (error.response?.status === 0 || error.code === 'ERR_NETWORK') {
+      } else if (err.response?.status === 0 || err.code === 'ERR_NETWORK') {
         throw new Error(`Network error: Cannot connect to backend at ${api.defaults.baseURL}. Is the backend running on port 8080?`)
-      } else if (error.response?.status === 403 || error.response?.status === 401) {
-        throw new Error(`Access denied: ${error.response?.data?.message || 'Check CORS configuration'}`)
+      } else if (err.response?.status === 403 || err.response?.status === 401) {
+        throw new Error(`Access denied: ${(err.response?.data as { message?: string })?.message || 'Check CORS configuration'}`)
       } else {
-        throw new Error(error.response?.data?.error || error.message || 'Failed to fetch listings')
+        throw new Error((err.response?.data as { error?: string })?.error || err.message || 'Failed to fetch listings')
       }
     }
   },

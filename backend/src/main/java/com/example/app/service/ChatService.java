@@ -3,6 +3,8 @@ package com.example.app.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,9 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ChatService {
+  
+  private static final Logger logger = LoggerFactory.getLogger(ChatService.class);
+  
   @PersistenceContext
   private EntityManager em;
   private final ChatRepository cr;
@@ -99,54 +104,97 @@ public class ChatService {
     return "User " + user.getId();
   }
 
+  /**
+   * Send a message and return it
+   */
+  @Transactional
   public Messages send(Long chatId, StartMessageRequest r){
-    // var m = new Messages();
-    // m.setChatId(r.chat_id());
-    // m.setSenderId(r.sender_id());
-    // m.setRecieverId(r.reciever_id()); // ensure Messages entity uses the same property names
-    // m.setMsg(r.msg());
-    return mr.insertMessage(
-      chatId,
-      r.sender_id(),
-      r.reciever_id(),
-      r.msg()
-    );
+    logger.info("Sending message in chat {}: sender={}, receiver={}", 
+                chatId, r.sender_id(), r.reciever_id());
+    
+    try {
+      // Verify chat exists
+      Chat chat = cr.findById(chatId)
+        .orElseThrow(() -> new RuntimeException("Chat not found with id: " + chatId));
+      
+      logger.info("Chat found: buyer={}, seller={}", chat.getBuyerId(), chat.getSellerId());
+      
+      // Create new message
+      Messages message = new Messages();
+      message.setChatId(chatId);
+      message.setSenderId(r.sender_id());
+      message.setRecieverId(r.reciever_id());
+      message.setMsg(r.msg());
+      
+      // Save message
+      Messages savedMessage = mr.save(message);
+      logger.info("Message saved with ID: {}", savedMessage.getId());
+      
+      // Update chat's updated_at timestamp
+      chat.setUpdatedAt(java.time.OffsetDateTime.now());
+      cr.save(chat);
+      
+      return savedMessage;
+    } catch (Exception e) {
+      logger.error("Error sending message in chat {}: {}", chatId, e.getMessage(), e);
+      throw e;
+    }
   }
 
+  /**
+   * Send a message and return all messages in the chat
+   */
   @Transactional
   public MessageResponse sendAndFetchAll(Long chatId, StartMessageRequest r){
-    final String sql = """
-        with ins as (
-                insert into messages (chat_id, sender_id, reciever_id, msg)
-                values (:chatId, :senderId, :recieverId, :msg)
-                returning chat_id
-            )
-            select m.* from messages m join ins on m.chat_id = ins.chat_id
-            order by id
-        """;
-      @SuppressWarnings("unchecked")
-      List<Messages> rows = em.createNativeQuery(sql, Messages.class)
-      .setParameter("chatId", chatId)
-      .setParameter("senderId", r.sender_id())
-      .setParameter("recieverId", r.reciever_id())
-      .setParameter("msg", r.msg())
-      .getResultList();
-      return new MessageResponse(chatId, rows);
+    logger.info("Send and fetch all for chat {}", chatId);
+    
+    try {
+      // Send the message
+      send(chatId, r);
+      
+      // Fetch all messages for this chat
+      List<Messages> allMessages = messages(chatId);
+      
+      logger.info("Returning {} messages for chat {}", allMessages.size(), chatId);
+      return new MessageResponse(chatId, allMessages);
+    } catch (Exception e) {
+      logger.error("Error in sendAndFetchAll for chat {}: {}", chatId, e.getMessage(), e);
+      throw e;
+    }
   }
 
+  /**
+   * Get all messages for a chat, ordered by time
+   */
   public List<Messages> messages(Long conversationId) {
+    logger.info("Fetching messages for chat ID: {}", conversationId);
+    
     if (conversationId == null) {
+      logger.error("Chat ID is null");
       throw new IllegalArgumentException("Chat ID cannot be null");
     }
     
-    // Verify chat exists
-    if (!cr.existsById(conversationId)) {
-      throw new RuntimeException("Chat not found with id: " + conversationId);
+    try {
+      // Verify chat exists
+      boolean chatExists = cr.existsById(conversationId);
+      logger.info("Chat {} exists: {}", conversationId, chatExists);
+      
+      if (!chatExists) {
+        logger.warn("Chat not found with id: {}", conversationId);
+        throw new RuntimeException("Chat not found with id: " + conversationId);
+      }
+      
+      // Fetch messages
+      List<Messages> messages = mr.findByChatId(conversationId);
+      logger.info("Found {} messages for chat {}", messages != null ? messages.size() : 0, conversationId);
+      
+      // Return empty list if no messages (instead of null)
+      return messages != null ? messages : List.of();
+      
+    } catch (Exception e) {
+      logger.error("Error fetching messages for chat {}: {}", conversationId, e.getMessage(), e);
+      throw e;
     }
-    
-    // Return empty list if no messages (instead of null)
-    List<Messages> messages = mr.findByChatId(conversationId);
-    return messages != null ? messages : List.of();
   }
 
   public List<Chat> myConversations(Long userId) {

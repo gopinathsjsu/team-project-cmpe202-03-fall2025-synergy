@@ -38,9 +38,10 @@ export default function Reports() {
       setError(null)
       const data = await adminApi.getReports()
       setItems(data.map(mapReport))
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Failed to load reports:', err)
-      const message = err?.response?.data?.error || err?.message || 'Failed to load reports. Please try again.'
+      const error = err as { response?: { data?: { error?: string } }; message?: string };
+      const message = error?.response?.data?.error || error?.message || 'Failed to load reports. Please try again.'
       setError(message)
     } finally {
       setLoading(false)

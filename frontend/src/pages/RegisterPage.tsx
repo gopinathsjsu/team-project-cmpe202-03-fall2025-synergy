@@ -69,8 +69,9 @@ const RegisterPage = () => {
 
       // Redirect to home page
       navigate('/')
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed. Please try again.')
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { error?: string } } };
+      setError(error.response?.data?.error || 'Registration failed. Please try again.')
       console.error('Registration error:', err)
     } finally {
       setLoading(false)

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { User, Settings, Heart, ShoppingBag, MessageCircle, Edit, Camera } from 'lucide-react'
+import { Settings, Heart, ShoppingBag, MessageCircle, Edit, Camera } from 'lucide-react'
 
 const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('listings')

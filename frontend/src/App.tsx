@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation, Link } from 'react-router-dom'
-import { ShoppingBag, MessageCircle, User, Search } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -9,6 +9,7 @@ import ProfilePage from './pages/ProfilePage'
 import ListingDetailsPage from './pages/ListingDetailsPage'
 import ListingsPage from './pages/ListingsPage'
 import Navbar from './components/Navbar'
+import ChatbotWidget from './components/ChatbotWidget'
 import AdminApp from './admin/App'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ChatProvider } from './Provider/ChatProvider'
@@ -16,6 +17,32 @@ import { ChatProvider } from './Provider/ChatProvider'
 function InnerApp() {
   const location = useLocation()
   const isAdmin = location.pathname.startsWith('/admin')
+  
+  // Track authentication status for chatbot visibility
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem('token')
+    return token !== null && localStorage.getItem('userAuth') === 'true'
+  })
+
+  // Listen for login/logout events to update chatbot visibility
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const token = localStorage.getItem('token')
+      setIsAuthenticated(token !== null && localStorage.getItem('userAuth') === 'true')
+    }
+
+    // Listen for custom auth events
+    window.addEventListener('userLogin', handleAuthChange)
+    window.addEventListener('userLogout', handleAuthChange)
+    window.addEventListener('storage', handleAuthChange)
+
+    return () => {
+      window.removeEventListener('userLogin', handleAuthChange)
+      window.removeEventListener('userLogout', handleAuthChange)
+      window.removeEventListener('storage', handleAuthChange)
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-gray-50">
       {!isAdmin && <Navbar />}
@@ -90,6 +117,9 @@ function InnerApp() {
           />
         </Routes>
       </main>
+      
+      {/* Show chatbot only when user is authenticated and not on admin pages */}
+      {isAuthenticated && !isAdmin && <ChatbotWidget />}
     </div>
   )
 }
