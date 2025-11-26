@@ -9,7 +9,6 @@ interface UserProfile {
   email: string
   avatar: string
   joinDate: string
-  rating: number
   totalSales: number
   totalPurchases: number
 }
@@ -80,7 +79,6 @@ const ProfilePage = () => {
           email: user.email || '',
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6366f1&color=fff&size=100`,
           joinDate: joinDate,
-          rating: 4.8, // This would need to be calculated from reviews/ratings
           totalSales,
           totalPurchases
         })
@@ -229,14 +227,6 @@ const ProfilePage = () => {
             
             <div className="flex items-center space-x-6">
               <div className="text-center">
-                <div className="flex items-center space-x-1">
-                  <span className="text-2xl font-bold text-gray-900">{userProfile.rating}</span>
-                  <span className="text-yellow-400">★</span>
-                </div>
-                <p className="text-sm text-gray-500">Rating</p>
-              </div>
-              
-              <div className="text-center">
                 <p className="text-2xl font-bold text-gray-900">{userProfile.totalSales}</p>
                 <p className="text-sm text-gray-500">Items Sold</p>
               </div>
@@ -335,7 +325,7 @@ const ProfilePage = () => {
                           </span>
                           <button 
                             className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                               e.stopPropagation()
                               navigate(`/listings/${listing.id}/edit`)
                             }}
