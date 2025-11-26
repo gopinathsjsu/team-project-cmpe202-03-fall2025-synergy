@@ -34,6 +34,7 @@ const ProfilePage = () => {
         if (!userIdStr) {
           setError('User not authenticated. Please log in.')
           setLoading(false)
+          navigate('/login')
           return
         }
 
@@ -44,16 +45,26 @@ const ProfilePage = () => {
           return
         }
 
-        // Fetch user data
-        const user = await authApi.getUserById(userId)
-        setUserData(user)
+        // Fetch user data and listings in parallel
+        const [user, listings] = await Promise.all([
+          authApi.getUserById(userId).catch(err => {
+            console.error('Error fetching user:', err)
+            throw new Error(err.response?.data?.error || err.message || 'Failed to load user data')
+          }),
+          productApi.getBySeller(userId).catch(err => {
+            console.error('Error fetching listings:', err)
+            // Don't fail the whole page if listings fail, just return empty array
+            return []
+          })
+        ])
 
-        // Fetch user's listings
-        const listings = await productApi.getBySeller(userId)
-        setUserListings(listings)
+        setUserData(user)
+        setUserListings(Array.isArray(listings) ? listings : [])
 
         // Calculate stats
-        const totalSales = listings.filter(p => p.status === 'sold' || p.status === 'SOLD').length
+        const totalSales = Array.isArray(listings) 
+          ? listings.filter(p => p && (p.status === 'sold' || p.status === 'SOLD')).length 
+          : 0
         const totalPurchases = 0 // This would need to be tracked separately in the backend
         
         // Format join date (using current date as placeholder since User model doesn't have createdAt)
@@ -62,11 +73,11 @@ const ProfilePage = () => {
         // Build user profile
         const fullName = user.firstName && user.lastName 
           ? `${user.firstName} ${user.lastName}`
-          : user.username
+          : user.username || 'User'
 
         setUserProfile({
           name: fullName,
-          email: user.email,
+          email: user.email || '',
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6366f1&color=fff&size=100`,
           joinDate: joinDate,
           rating: 4.8, // This would need to be calculated from reviews/ratings
@@ -76,13 +87,30 @@ const ProfilePage = () => {
 
       } catch (err: any) {
         console.error('Error fetching profile data:', err)
-        setError(err.response?.data?.error || err.message || 'Failed to load profile data')
+        let errorMessage = 'Failed to load profile data'
+        
+        if (err.response?.status === 401 || err.response?.status === 403) {
+          errorMessage = 'Authentication failed. Please log in again.'
+          localStorage.removeItem('token')
+          localStorage.removeItem('userAuth')
+          localStorage.removeItem('userId')
+          setTimeout(() => navigate('/login'), 2000)
+        } else if (err.response?.status === 404) {
+          errorMessage = 'User not found'
+        } else if (err.message) {
+          errorMessage = err.message
+        } else if (err.response?.data?.error) {
+          errorMessage = err.response.data.error
+        }
+        
+        setError(errorMessage)
       } finally {
         setLoading(false)
       }
     }
 
     fetchProfileData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const formatDate = (dateString?: string) => {
@@ -124,13 +152,25 @@ const ProfilePage = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="card">
           <div className="text-center py-12">
-            <p className="text-red-600 mb-4">{error}</p>
-            <button 
-              onClick={() => navigate('/login')}
-              className="btn-primary"
-            >
-              Go to Login
-            </button>
+            <p className="text-red-600 mb-4 font-medium">{error}</p>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => {
+                  setError(null)
+                  setLoading(true)
+                  window.location.reload()
+                }}
+                className="btn-primary"
+              >
+                Retry
+              </button>
+              <button 
+                onClick={() => navigate('/login')}
+                className="btn-secondary"
+              >
+                Go to Login
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -334,13 +374,13 @@ const ProfilePage = () => {
                   </label>
                   <input
                     type="text"
-                    value={userData.username}
+                    value={userData?.username || ''}
                     className="input-field"
                     readOnly
                   />
                 </div>
                 
-                {userData.firstName && (
+                {userData?.firstName && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       First Name
@@ -354,7 +394,7 @@ const ProfilePage = () => {
                   </div>
                 )}
                 
-                {userData.lastName && (
+                {userData?.lastName && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Last Name

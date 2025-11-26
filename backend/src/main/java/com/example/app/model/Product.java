@@ -43,7 +43,7 @@ public class Product {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = true)
     private LocalDateTime updatedAt;
     
     @Column(name = "embedding", columnDefinition = "vector(384)", insertable = false, updatable = false, nullable = true)

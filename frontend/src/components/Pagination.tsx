@@ -61,81 +61,100 @@ const Pagination = ({
   const endItem = Math.min((currentPage + 1) * pageSize, totalElements)
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
-      {/* Page size selector */}
-      <div className="flex items-center gap-2">
-        <label htmlFor="pageSize" className="text-sm text-gray-700">
-          Show:
-        </label>
-        <select
-          id="pageSize"
-          value={pageSize}
-          onChange={(e) => onPageSizeChange(Number(e.target.value))}
-          className="border border-gray-300 rounded-md px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-        </select>
-        <span className="text-sm text-gray-600">
-          per page
-        </span>
-      </div>
-
-      {/* Page info */}
-      <div className="text-sm text-gray-600">
-        Showing {startItem} to {endItem} of {totalElements} listings
-      </div>
-
-      {/* Pagination controls */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 0}
-          className="p-2 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="Previous page"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-
-        <div className="flex items-center gap-1">
-          {getPageNumbers().map((page, index) => {
-            if (page === 'ellipsis') {
-              return (
-                <span key={`ellipsis-${index}`} className="px-2 text-gray-400">
-                  ...
-                </span>
-              )
-            }
-
-            const pageNum = page as number
-            const isActive = pageNum === currentPage
-
-            return (
-              <button
-                key={pageNum}
-                onClick={() => onPageChange(pageNum)}
-                className={`min-w-[2.5rem] px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'bg-primary-600 text-white'
-                    : 'border border-gray-300 hover:bg-gray-50 text-gray-700'
-                }`}
-                aria-label={`Go to page ${pageNum + 1}`}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                {pageNum + 1}
-              </button>
-            )
-          })}
+    <div className="w-full">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+        {/* Page size selector - Left side */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <label htmlFor="pageSize" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+            Show:
+          </label>
+          <select
+            id="pageSize"
+            value={pageSize}
+            onChange={(e) => onPageSizeChange(Number(e.target.value))}
+            className="border border-gray-300 rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all cursor-pointer min-w-[90px] shadow-sm"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
+            <option value={50}>50</option>
+          </select>
+          <span className="text-sm text-gray-600 whitespace-nowrap">
+            per page
+          </span>
         </div>
 
-        <button
-          onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage >= totalPages - 1}
-          className="p-2 rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          aria-label="Next page"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
+        {/* Page info - Center (hidden on small screens) */}
+        <div className="hidden md:block text-sm text-gray-600 flex-shrink-0">
+          <span className="font-medium text-gray-700">{startItem}</span> to{' '}
+          <span className="font-medium text-gray-700">{endItem}</span> of{' '}
+          <span className="font-medium text-gray-700">{totalElements}</span> products
+        </div>
+
+        {/* Pagination controls - Right side */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          {/* Previous button */}
+          <button
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 0}
+            className="p-2.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition-all duration-200 flex items-center justify-center min-w-[44px] h-10 shadow-sm"
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="h-5 w-5 text-gray-700" />
+          </button>
+
+          {/* Page numbers */}
+          <div className="flex items-center gap-1.5 flex-wrap justify-center">
+            {getPageNumbers().map((page, index) => {
+              if (page === 'ellipsis') {
+                return (
+                  <span 
+                    key={`ellipsis-${index}`} 
+                    className="px-2 py-1 text-gray-400 font-medium"
+                  >
+                    ...
+                  </span>
+                )
+              }
+
+              const pageNum = page as number
+              const isActive = pageNum === currentPage
+
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => onPageChange(pageNum)}
+                  className={`min-w-[44px] h-10 px-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    isActive
+                      ? 'bg-primary-600 text-white shadow-md hover:bg-primary-700'
+                      : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 shadow-sm'
+                  }`}
+                  aria-label={`Go to page ${pageNum + 1}`}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {pageNum + 1}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Next button */}
+          <button
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage >= totalPages - 1}
+            className="p-2.5 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition-all duration-200 flex items-center justify-center min-w-[44px] h-10 shadow-sm"
+            aria-label="Next page"
+          >
+            <ChevronRight className="h-5 w-5 text-gray-700" />
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile page info - shown only on small screens */}
+      <div className="md:hidden text-center mt-4 text-sm text-gray-600">
+        <span className="font-medium text-gray-700">{startItem}</span> to{' '}
+        <span className="font-medium text-gray-700">{endItem}</span> of{' '}
+        <span className="font-medium text-gray-700">{totalElements}</span> products
       </div>
     </div>
   )
