@@ -25,8 +25,16 @@ const HomePage = () => {
       try {
         const products = await productApi.getAll()
         setFeaturedProducts(products)
-      } catch (err: any) {
-        setFeaturedError(err.response?.data?.error || err.message || 'Unable to load featured products.')
+      } catch (err: unknown) {
+        const error = err as {
+          response?: {
+            data?: {
+              error?: string
+            }
+          }
+          message?: string
+        }
+        setFeaturedError(error.response?.data?.error || error.message || 'Unable to load featured products.')
       } finally {
         setFeaturedLoading(false)
       }

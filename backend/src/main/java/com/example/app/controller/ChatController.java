@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.app.dto.ChatDTO;
-import com.example.app.dto.StartMessageRequest;
 import com.example.app.dto.startChatRequest;
 import com.example.app.model.Chat;
 import com.example.app.service.ChatService;

@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Search, SlidersHorizontal, Loader2, X } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { productApi } from '../services/productApi'
@@ -34,14 +34,24 @@ const ListingsPage = () => {
         console.log('[ListingsPage] Received products:', products.length)
         setAllProducts(products)
       } catch (err: unknown) {
-        const error = err as { response?: { data?: { error?: string } }; message?: string };
-        const errorMessage = error.response?.data?.error || error.message || 'Failed to load products'
         console.error('[ListingsPage] Error fetching products:', err)
+        const error = err as { 
+          response?: { 
+            status?: number
+            data?: { 
+              error?: string
+              message?: string
+            }
+          }
+          message?: string
+          code?: string
+        }
+        
         let errorMessage = 'Failed to load products'
         
-        if (err.response) {
-          const status = err.response?.status
-          const data = err.response?.data
+        if (error.response) {
+          const status = error.response?.status
+          const data = error.response?.data
           
           if (status === 500) {
             // Server error - likely database issue
@@ -55,11 +65,11 @@ const ListingsPage = () => {
           } else if (status === 401 || status === 403) {
             errorMessage = 'Authentication required. Please log in.'
           } else {
-            errorMessage = data?.error || data?.message || err.message || errorMessage
+            errorMessage = data?.error || data?.message || error.message || errorMessage
           }
-        } else if (err.message) {
-          errorMessage = err.message
-        } else if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED') {
+        } else if (error.message) {
+          errorMessage = error.message
+        } else if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED') {
           errorMessage = 'Unable to connect to server. Please check if the backend is running on port 8080.'
         }
         
@@ -204,13 +214,13 @@ const ListingsPage = () => {
                   <input
                     type="text"
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
                     placeholder="Search by name or description..."
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder:text-gray-400 shadow-sm"
                   />
                   {query && (
                     <button
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                         e.stopPropagation()
                         setQuery('')
                       }}
@@ -240,10 +250,10 @@ const ListingsPage = () => {
                 </div>
                 <select 
                   value={category} 
-                  onChange={(e) => updateCategoryParam(e.target.value)} 
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => updateCategoryParam(e.target.value)} 
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white text-gray-900 cursor-pointer shadow-sm font-medium"
                 >
-                  {availableCategories.map((c) => (
+                  {availableCategories.map((c: string) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
@@ -260,7 +270,7 @@ const ListingsPage = () => {
                       type="number"
                       placeholder="Min $"
                       value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMinPrice(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder:text-gray-400 shadow-sm"
                       min="0"
                       step="0.01"
@@ -271,7 +281,7 @@ const ListingsPage = () => {
                       type="number"
                       placeholder="Max $"
                       value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxPrice(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white text-gray-900 placeholder:text-gray-400 shadow-sm"
                       min="0"
                       step="0.01"
@@ -422,7 +432,7 @@ const ListingsPage = () => {
               
               {/* Product Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {paginatedProducts.map((p) => (
+                {paginatedProducts.map((p: Product) => (
                   <Link 
                     key={p.id} 
                     to={`/listings/${p.id}`} 
@@ -434,7 +444,7 @@ const ListingsPage = () => {
                         src={p.imageUrl || 'https://placehold.co/400x300?text=No+Image'} 
                         alt={p.name || 'Product'} 
                         className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" 
-                        onError={(e) => {
+                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                           (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=No+Image'
                         }}
                       />

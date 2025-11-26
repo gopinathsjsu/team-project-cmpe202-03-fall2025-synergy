@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { User as UserIcon, Settings, ShoppingBag, MessageCircle, Edit, Camera, Loader2 } from 'lucide-react'
+import { Settings, ShoppingBag, MessageCircle, Edit, Camera, Loader2 } from 'lucide-react'
 import { authApi, type User } from '../services/authApi'
 import { productApi, type Product } from '../services/productApi'
 
@@ -85,22 +85,32 @@ const ProfilePage = () => {
           totalPurchases
         })
 
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching profile data:', err)
+        const error = err as {
+          response?: {
+            status?: number
+            data?: {
+              error?: string
+            }
+          }
+          message?: string
+        }
+        
         let errorMessage = 'Failed to load profile data'
         
-        if (err.response?.status === 401 || err.response?.status === 403) {
+        if (error.response?.status === 401 || error.response?.status === 403) {
           errorMessage = 'Authentication failed. Please log in again.'
           localStorage.removeItem('token')
           localStorage.removeItem('userAuth')
           localStorage.removeItem('userId')
           setTimeout(() => navigate('/login'), 2000)
-        } else if (err.response?.status === 404) {
+        } else if (error.response?.status === 404) {
           errorMessage = 'User not found'
-        } else if (err.message) {
-          errorMessage = err.message
-        } else if (err.response?.data?.error) {
-          errorMessage = err.response.data.error
+        } else if (error.message) {
+          errorMessage = error.message
+        } else if (error.response?.data?.error) {
+          errorMessage = error.response.data.error
         }
         
         setError(errorMessage)
@@ -292,7 +302,7 @@ const ProfilePage = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {userListings.map((listing) => (
+                  {userListings.map((listing: Product) => (
                     <div 
                       key={listing.id} 
                       className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
@@ -302,7 +312,7 @@ const ProfilePage = () => {
                         src={listing.imageUrl || 'https://via.placeholder.com/200x150?text=No+Image'}
                         alt={listing.name}
                         className="w-full h-48 object-cover"
-                        onError={(e) => {
+                        onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                           (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x150?text=No+Image'
                         }}
                       />
