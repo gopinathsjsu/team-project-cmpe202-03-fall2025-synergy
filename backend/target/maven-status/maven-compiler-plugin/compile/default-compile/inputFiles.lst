@@ -60,10 +60,7 @@
 /app/src/main/java/com/example/app/controller/AdminController.java
 /app/src/main/java/com/example/app/dto/UserDTO.java
 /app/src/main/java/com/example/app/controller/ChatController.java
-<<<<<<< HEAD
 /app/src/main/java/com/example/app/dto/ChatDTO.java
-=======
->>>>>>> 7a79e50 (sematic serach implementation)
 /app/src/main/java/com/example/app/dto/RegisterRequest.java
 /app/src/main/java/com/example/app/controller/MessageController.java
 /app/src/main/java/com/example/app/dto/startChatRequest.java
