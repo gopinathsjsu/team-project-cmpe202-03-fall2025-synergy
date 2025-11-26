@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, MessageCircle, Bookmark, Loader2, AlertCircle } from 'lucide-react'
+import { ArrowLeft, MessageCircle, Loader2, AlertCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
@@ -198,15 +198,6 @@ const ListingDetailsPage = () => {
             >
               <MessageCircle className="h-4 w-4" />
               <span>Chat with seller</span>
-            </button>
-            <button 
-              className="btn-secondary w-full flex items-center justify-center space-x-2"
-              onClick={() => {
-                console.log('Save clicked')
-              }}
-            >
-              <Bookmark className="h-4 w-4" />
-              <span>Save</span>
             </button>
           </div>
 

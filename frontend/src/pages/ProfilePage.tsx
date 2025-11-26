@@ -1,55 +1,153 @@
-import { useState } from 'react'
-import { Settings, Heart, ShoppingBag, MessageCircle, Edit, Camera } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { User as UserIcon, Settings, ShoppingBag, MessageCircle, Edit, Camera, Loader2 } from 'lucide-react'
+import { authApi, type User } from '../services/authApi'
+import { productApi, type Product } from '../services/productApi'
+
+interface UserProfile {
+  name: string
+  email: string
+  avatar: string
+  joinDate: string
+  rating: number
+  totalSales: number
+  totalPurchases: number
+}
 
 const ProfilePage = () => {
+  const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState('listings')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [userData, setUserData] = useState<User | null>(null)
+  const [userListings, setUserListings] = useState<Product[]>([])
 
-  const userProfile = {
-    name: 'John Doe',
-    email: 'john.doe@university.edu',
-    avatar: 'https://via.placeholder.com/100x100?text=JD',
-    joinDate: 'September 2024',
-    rating: 4.8,
-    totalSales: 12,
-    totalPurchases: 8
-  }
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        setLoading(true)
+        setError(null)
 
-  const userListings = [
-    {
-      id: 1,
-      title: 'Calculus Textbook - Stewart 8th Edition',
-      price: 45,
-      image: 'https://via.placeholder.com/200x150?text=Calculus',
-      status: 'active',
-      views: 24,
-      createdAt: '2 days ago'
-    },
-    {
-      id: 2,
-      title: 'MacBook Pro 13" - 2020 Model',
-      price: 1200,
-      image: 'https://via.placeholder.com/200x150?text=MacBook',
-      status: 'sold',
-      views: 156,
-      createdAt: '1 week ago'
-    },
-    {
-      id: 3,
-      title: 'Gaming Chair - Ergonomic',
-      price: 150,
-      image: 'https://via.placeholder.com/200x150?text=Chair',
-      status: 'active',
-      views: 8,
-      createdAt: '3 days ago'
+        // Get userId from localStorage
+        const userIdStr = localStorage.getItem('userId')
+        if (!userIdStr) {
+          setError('User not authenticated. Please log in.')
+          setLoading(false)
+          return
+        }
+
+        const userId = parseInt(userIdStr, 10)
+        if (isNaN(userId)) {
+          setError('Invalid user ID')
+          setLoading(false)
+          return
+        }
+
+        // Fetch user data
+        const user = await authApi.getUserById(userId)
+        setUserData(user)
+
+        // Fetch user's listings
+        const listings = await productApi.getBySeller(userId)
+        setUserListings(listings)
+
+        // Calculate stats
+        const totalSales = listings.filter(p => p.status === 'sold' || p.status === 'SOLD').length
+        const totalPurchases = 0 // This would need to be tracked separately in the backend
+        
+        // Format join date (using current date as placeholder since User model doesn't have createdAt)
+        const joinDate = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+
+        // Build user profile
+        const fullName = user.firstName && user.lastName 
+          ? `${user.firstName} ${user.lastName}`
+          : user.username
+
+        setUserProfile({
+          name: fullName,
+          email: user.email,
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6366f1&color=fff&size=100`,
+          joinDate: joinDate,
+          rating: 4.8, // This would need to be calculated from reviews/ratings
+          totalSales,
+          totalPurchases
+        })
+
+      } catch (err: any) {
+        console.error('Error fetching profile data:', err)
+        setError(err.response?.data?.error || err.message || 'Failed to load profile data')
+      } finally {
+        setLoading(false)
+      }
     }
-  ]
+
+    fetchProfileData()
+  }, [])
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Unknown'
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    
+    if (diffDays === 0) return 'Today'
+    if (diffDays === 1) return 'Yesterday'
+    if (diffDays < 7) return `${diffDays} days ago`
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`
+    return `${Math.floor(diffDays / 365)} years ago`
+  }
 
   const tabs = [
     { id: 'listings', label: 'My Listings', icon: ShoppingBag },
-    { id: 'favorites', label: 'Favorites', icon: Heart },
     { id: 'messages', label: 'Messages', icon: MessageCircle },
     { id: 'settings', label: 'Settings', icon: Settings }
   ]
+
+  if (loading) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-600 mx-auto mb-4" />
+            <p className="text-gray-600">Loading profile...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="card">
+          <div className="text-center py-12">
+            <p className="text-red-600 mb-4">{error}</p>
+            <button 
+              onClick={() => navigate('/login')}
+              className="btn-primary"
+            >
+              Go to Login
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!userProfile || !userData) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="card">
+          <div className="text-center py-12">
+            <p className="text-gray-600">No profile data available</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -132,53 +230,74 @@ const ProfilePage = () => {
             <div>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-900">My Listings</h2>
-                <button className="btn-primary">
+                <button 
+                  onClick={() => navigate('/create-listing')}
+                  className="btn-primary"
+                >
                   Create New Listing
                 </button>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {userListings.map((listing) => (
-                  <div key={listing.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                    <img
-                      src={listing.image}
-                      alt={listing.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 mb-2">{listing.title}</h3>
-                      <p className="text-2xl font-bold text-primary-600 mb-2">${listing.price}</p>
-                      <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
-                        <span>{listing.views} views</span>
-                        <span>{listing.createdAt}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          listing.status === 'active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {listing.status}
-                        </span>
-                        <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-                          Edit
-                        </button>
+              {userListings.length === 0 ? (
+                <div className="text-center py-12">
+                  <ShoppingBag className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No listings yet</h3>
+                  <p className="text-gray-500 mb-4">Start selling by creating your first listing</p>
+                  <button 
+                    onClick={() => navigate('/create-listing')}
+                    className="btn-primary"
+                  >
+                    Create Listing
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {userListings.map((listing) => (
+                    <div 
+                      key={listing.id} 
+                      className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => navigate(`/listings/${listing.id}`)}
+                    >
+                      <img
+                        src={listing.imageUrl || 'https://via.placeholder.com/200x150?text=No+Image'}
+                        alt={listing.name}
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x150?text=No+Image'
+                        }}
+                      />
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 mb-2">{listing.name}</h3>
+                        <p className="text-2xl font-bold text-primary-600 mb-2">${listing.price}</p>
+                        <div className="flex justify-between items-center text-sm text-gray-500 mb-3">
+                          <span>{listing.category || 'Uncategorized'}</span>
+                          <span>{formatDate(listing.createdAt)}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            listing.status === 'active' || listing.status === 'ACTIVE'
+                              ? 'bg-green-100 text-green-800' 
+                              : listing.status === 'sold' || listing.status === 'SOLD'
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {listing.status || 'active'}
+                          </span>
+                          <button 
+                            className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              navigate(`/listings/${listing.id}/edit`)
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'favorites' && (
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Favorite Items</h2>
-              <div className="text-center py-12">
-                <Heart className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No favorites yet</h3>
-                <p className="text-gray-500">Items you favorite will appear here</p>
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -211,14 +330,43 @@ const ProfilePage = () => {
                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name
+                    Username
                   </label>
                   <input
                     type="text"
-                    value={userProfile.name}
+                    value={userData.username}
                     className="input-field"
+                    readOnly
                   />
                 </div>
+                
+                {userData.firstName && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      value={userData.firstName}
+                      className="input-field"
+                      readOnly
+                    />
+                  </div>
+                )}
+                
+                {userData.lastName && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={userData.lastName}
+                      className="input-field"
+                      readOnly
+                    />
+                  </div>
+                )}
                 
                 <div className="flex justify-end">
                   <button className="btn-primary">

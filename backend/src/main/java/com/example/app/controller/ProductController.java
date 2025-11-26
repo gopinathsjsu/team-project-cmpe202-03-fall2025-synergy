@@ -110,6 +110,23 @@ public class ProductController {
     }
     
     /**
+     * Get products by seller ID
+     */
+    @GetMapping("/seller/{sellerId}")
+    public ResponseEntity<List<Product>> getProductsBySeller(@PathVariable Long sellerId) {
+        logger.info("GET /api/products/seller/{} - Fetching products by seller ID", sellerId);
+        try {
+            List<Product> products = productService.getProductsBySeller(sellerId);
+            logger.info("Returning {} products for seller {}", products.size(), sellerId);
+            return ResponseEntity.ok(products);
+        } catch (Exception e) {
+            logger.error("Error fetching products by seller ID: {}", sellerId, e);
+            return ResponseEntity.status(500)
+                    .body(List.of());
+        }
+    }
+    
+    /**
      * Create a new product
      */
     @PostMapping

@@ -62,6 +62,15 @@ export interface UpdateProfileRequest {
   email: string
 }
 
+export interface User {
+  id: number
+  username: string
+  email: string
+  firstName?: string
+  lastName?: string
+  status?: string
+}
+
 export const authApi = {
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
     const response = await api.post<AuthResponse>('/auth/register', data)
@@ -106,6 +115,11 @@ export const authApi = {
   // Get current user profile
   getCurrentProfile: async (): Promise<UserProfile> => {
     const response = await authAxios.get('/users/me')
+    return response.data
+  },
+
+  getUserById: async (id: number): Promise<User> => {
+    const response = await api.get<User>(`/users/${id}`)
     return response.data
   },
   

@@ -170,6 +170,11 @@ export const productApi = {
     return response.data.map(normalizeProduct)
   },
 
+  getBySeller: async (sellerId: number): Promise<Product[]> => {
+    const response = await api.get<Product[]>(`/products/seller/${sellerId}`)
+    return response.data
+  },
+
   create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {
     const response = await api.post<Product>('/products', product)
     return normalizeProduct(response.data)
