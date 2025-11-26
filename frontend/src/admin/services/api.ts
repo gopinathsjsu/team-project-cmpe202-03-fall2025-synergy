@@ -29,11 +29,16 @@ export interface AdminUserRow {
 export interface AdminListingRow {
   id: number
   product_name?: string | null
+  name?: string | null // Product name can be in 'name' or 'product_name' column
   img?: string | null
+  image_url?: string | null
   category?: string | null
-  cond?: string | null
+  condition?: string | null // Direct condition column from products table
+  cond?: string | null // Alias from join query
   description?: string | null
   price?: number | null
+  seller_id?: number | null // Seller ID from products table
+  created_at?: string | null // Created timestamp
   [key: string]: unknown
 }
 

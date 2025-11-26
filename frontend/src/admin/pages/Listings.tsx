@@ -13,14 +13,23 @@ interface Listing {
 
 const mapListing = (row: AdminListingRow): Listing => {
   const priceValue = typeof row.price === 'number' ? row.price : Number(row.price)
+  // Product name can be in 'name' or 'product_name' column
+  const productName = row.name ?? row.product_name ?? `Listing ${row.id}`
+  // Condition can be in 'condition' (direct column) or 'cond' (join alias)
+  const condition = row.condition ?? row.cond ?? '—'
+  // Seller ID from seller_id column
+  const sellerId = row.seller_id != null ? String(row.seller_id) : '—'
+  // Created timestamp from created_at column
+  const createdAt = row.created_at ? new Date(row.created_at as string).toLocaleString() : '—'
+  
   return {
     id: row.id.toString(),
-    product: row.product_name ?? `Listing ${row.id}`,
+    product: productName,
     category: row.category ?? '—',
-    condition: row.cond ?? '—',
+    condition: condition,
     price: Number.isFinite(priceValue) ? `$${priceValue.toFixed(2)}` : '—',
-    sellerId: row.create_audit_id ? String(row.create_audit_id) : '—',
-    createdAt: row.create_audit_time ? new Date(row.create_audit_time as string).toLocaleString() : '—',
+    sellerId: sellerId,
+    createdAt: createdAt,
   }
 }
 
