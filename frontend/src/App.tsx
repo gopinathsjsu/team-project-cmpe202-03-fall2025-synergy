@@ -11,6 +11,7 @@ import ListingsPage from './pages/ListingsPage'
 import Navbar from './components/Navbar'
 import AdminApp from './admin/App'
 import ProtectedRoute from './components/ProtectedRoute'
+import { ChatProvider } from './Provider/ChatProvider'
 
 function InnerApp() {
   const location = useLocation()
@@ -96,7 +97,9 @@ function InnerApp() {
 function App() {
   return (
     <Router>
-      <InnerApp />
+      <ChatProvider>
+        <InnerApp />
+      </ChatProvider>
     </Router>
   )
 }

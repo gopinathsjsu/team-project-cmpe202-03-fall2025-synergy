@@ -15,6 +15,7 @@ com/example/app/dto/UserConversationsResponse.class
 com/example/app/controller/ChatController.class
 com/example/app/dto/UserDTO.class
 com/example/app/util/JwtUtil.class
+com/example/app/dto/ChatDTO.class
 com/example/app/dto/AuthResponse.class
 com/example/app/repository/UserRepository.class
 com/example/app/config/WebConfig$1.class

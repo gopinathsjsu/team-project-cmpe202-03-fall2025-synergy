@@ -33,6 +33,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
+<<<<<<< HEAD
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/users/**").permitAll()
                 .requestMatchers("/products/**").permitAll()
@@ -40,6 +41,16 @@ public class SecurityConfig {
                 .requestMatchers("/admin/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .anyRequest().permitAll() // Changed from authenticated() to permitAll() for now
+=======
+                .requestMatchers("/auth/register", "/auth/login", "/users").permitAll()
+                .requestMatchers("/admin/**").permitAll() // Allow admin endpoints without authentication for now
+                .requestMatchers("/users/*/status").permitAll() // Allow user status updates for admin
+                // Chat endpoints - permitAll for development (TODO: add proper auth when login is integrated)
+                .requestMatchers("/users/conversations").permitAll()
+                .requestMatchers("/chat/start").permitAll()
+                .requestMatchers("/chat/**/message").permitAll()
+                .anyRequest().authenticated()
+>>>>>>> 5f6b69b (Integration with products page)
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         

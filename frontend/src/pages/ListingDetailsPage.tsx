@@ -1,4 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom'
+<<<<<<< HEAD
 import { ArrowLeft, MessageCircle, Bookmark, Loader2, AlertCircle } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { productApi } from '../services/productApi'
@@ -10,6 +11,43 @@ const ListingDetailsPage = () => {
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
+=======
+import { ArrowLeft, MessageCircle, Bookmark } from 'lucide-react'
+import { api, CURRENT_USER_ID } from '../lib/api'
+import { useMarketPlaceContext } from '../context/marketPlaceContext'
+
+const ListingDetailsPage = () => {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { getListingById } = useMarketPlaceContext()
+  const listing = getListingById(id)
+
+  console.log(listing)
+
+  const handleChatWithSeller = async () => {
+    if (!listing) return
+    
+    try {
+      const productId = Number(listing.id)
+      // Seller id from listing data, fallback to 4 if not present
+      const sellerId = (listing as any).sellerId ?? 4
+      
+      const chatDTO = await api.startChat({
+        product_id: productId,
+        buyer_id: CURRENT_USER_ID,
+        seller_id: Number(sellerId),
+      })
+      
+      // Navigate to chat page focused on this chat
+      // Response is now ChatDTO directly (not wrapped in chat object)
+      navigate(`/chat?chatId=${chatDTO.id}`, { replace: false })
+    } catch (e: any) {
+      const errorMessage = e.response?.data?.error || e.message || "Failed to start chat"
+      console.error("Failed to start chat:", errorMessage)
+      // Could show a toast here if you have a toast system
+    }
+  }
+>>>>>>> 5f6b69b (Integration with products page)
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -155,11 +193,16 @@ const ListingDetailsPage = () => {
         <div className="space-y-4">
           <div className="card">
             <button 
+<<<<<<< HEAD
               className="btn-primary w-full flex items-center justify-center space-x-2 mb-3"
               onClick={() => {
                 // TODO: Implement chat functionality
                 console.log('Chat with seller clicked')
               }}
+=======
+              onClick={handleChatWithSeller}
+              className="btn-primary w-full flex items-center justify-center space-x-2 mb-3"
+>>>>>>> 5f6b69b (Integration with products page)
             >
               <MessageCircle className="h-4 w-4" />
               <span>Chat with seller</span>

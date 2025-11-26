@@ -2,13 +2,15 @@ package com.example.app.controller;
 
 import com.example.app.model.User;
 import com.example.app.model.UserStatus;
+import com.example.app.model.Messages;
 import com.example.app.service.UserService;
 import com.example.app.service.ChatService;
 import com.example.app.dto.UserIdRequest;
 import com.example.app.dto.UserConversationsResponse;
 import com.example.app.dto.ConversationWithMessages;
-import com.example.app.model.Chat;
+import com.example.app.dto.ChatDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://localhost:5174"})
 public class UserController {
 
     @Autowired
@@ -62,14 +64,40 @@ public class UserController {
     }
 
     @PostMapping("/conversations")
-    public ResponseEntity<UserConversationsResponse> getUserConversations(@RequestBody UserIdRequest req) {
-        Long userId = req.getUser_id();
-        User user = userService.getUserById(userId);
-        List<Chat> chats = chatService.myConversations(userId);
-        List<ConversationWithMessages> convs = chats.stream()
-                .map(c -> new ConversationWithMessages(c, chatService.messages(c.getId())))
+    public ResponseEntity<?> getUserConversations(@RequestBody UserIdRequest req) {
+        try {
+            if (req == null || req.getUser_id() == null) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "user_id is required"));
+            }
+            
+            Long userId = req.getUser_id();
+            User user = userService.getUserById(userId);
+            
+            // Get conversations with names
+            List<ChatDTO> chatsWithNames = chatService.myConversationsWithNames(userId);
+            
+            // Build conversations with messages
+            List<ConversationWithMessages> convs = chatsWithNames.stream()
+                .map(chatDTO -> {
+                    try {
+                        List<Messages> messages = chatService.messages(chatDTO.id());
+                        return new ConversationWithMessages(chatDTO, messages);
+                    } catch (Exception e) {
+                        // If messages fail to load, return conversation with empty messages
+                        return new ConversationWithMessages(chatDTO, List.of());
+                    }
+                })
                 .toList();
-        return ResponseEntity.ok(new UserConversationsResponse(user, convs));
+            
+            return ResponseEntity.ok(new UserConversationsResponse(user, convs));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to load conversations: " + e.getMessage()));
+        }
     }
 
     @PatchMapping("/{id}/status")

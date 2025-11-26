@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /app/src/main/java/com/example/app/config/DataInitializer.java
 /app/src/main/java/com/example/app/service/AuthenticationService.java
 /app/src/main/java/com/example/app/dto/ConversationWithMessages.java
@@ -37,3 +38,38 @@
 /app/src/main/java/com/example/app/repository/MessagesRepository.java
 /app/src/main/java/com/example/app/config/JwtAuthenticationFilter.java
 /app/src/main/java/com/example/app/controller/UserController.java
+=======
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/config/SecurityConfig.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/AuthResponse.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/model/User.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/controller/UserController.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/model/Chat.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/model/Messages.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/startChatRequest.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/UserIdRequest.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/RegisterRequest.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/UserDTO.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/UserConversationsResponse.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/ConversationWithMessages.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/repository/MessagesRepository.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/repository/UserRepository.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/service/UserService.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/config/DataInitializer.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/ChatDTO.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/controller/MessageController.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/util/JwtUtil.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/repository/ChatRepository.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/model/UserStatus.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/config/WebConfig.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/service/ChatService.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/CampusMarketplaceApplication.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/controller/AdminController.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/MessageResponse.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/controller/AuthController.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/service/AuthenticationService.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/controller/ChatController.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/StartMessageRequest.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/config/JwtAuthenticationFilter.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/config/CustomUserDetailsService.java
+/Users/spartan/Desktop/team-project-cmpe202-03-fall2025-synergy-1/backend/src/main/java/com/example/app/dto/LoginRequest.java
+>>>>>>> 5f6b69b (Integration with products page)

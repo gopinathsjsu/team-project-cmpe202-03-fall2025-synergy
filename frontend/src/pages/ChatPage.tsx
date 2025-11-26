@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Send, MessageCircle } from "lucide-react";
 import { useChat } from "../context/chatContext";
+import { Avatar } from "../components/Avatar";
 
 const ChatPage = () => {
   const {
@@ -57,39 +58,43 @@ const ChatPage = () => {
               </div>
             </div>
             <div className="overflow-y-auto">
-              {conversations.map((conversation) => (
-                <div
-                  key={conversation.id}
-                  onClick={() => selectConversation(conversation.id)}
-                  className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${
-                    activeChatId === conversation.id ? "bg-primary-50 border-primary-200" : ""
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <img
-                      src={conversation.avatar}
-                      alt={conversation.user}
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {conversation.user}
-                        </p>
-                        <p className="text-xs text-gray-500">{conversation.timestamp}</p>
-                      </div>
-                      <p className="text-sm text-gray-600 truncate">
-                        {conversation.lastMessage}
-                      </p>
-                    </div>
-                    {conversation.unread > 0 && (
-                      <div className="bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        {conversation.unread}
-                      </div>
-                    )}
-                  </div>
+              {conversations.length === 0 ? (
+                <div className="p-8 text-center text-gray-500">
+                  <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-sm font-medium mb-1">No conversations yet</p>
+                  <p className="text-xs">Start a chat from a listing</p>
                 </div>
-              ))}
+              ) : (
+                conversations.map((conversation) => (
+                  <div
+                    key={conversation.id}
+                    onClick={() => selectConversation(conversation.id)}
+                    className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                      activeChatId === conversation.id ? "bg-primary-50 border-primary-200" : ""
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Avatar name={conversation.user} className="w-10 h-10" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {conversation.user}
+                          </p>
+                          <p className="text-xs text-gray-500">{conversation.timestamp}</p>
+                        </div>
+                        <p className="text-sm text-gray-600 truncate">
+                          {conversation.lastMessage || "No messages yet"}
+                        </p>
+                      </div>
+                      {conversation.unread > 0 && (
+                        <div className="bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {conversation.unread}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -99,11 +104,7 @@ const ChatPage = () => {
             <div className="p-4 border-b border-gray-200 bg-white">
               <div className="flex items-center space-x-3">
                 {activeConversation && (
-                  <img
-                    src={activeConversation.avatar}
-                    alt={activeConversation.user}
-                    className="w-8 h-8 rounded-full"
-                  />
+                  <Avatar name={activeConversation.user} className="w-8 h-8" />
                 )}
                 <div>
                   <h4 className="font-medium text-gray-900">
@@ -116,8 +117,13 @@ const ChatPage = () => {
 
             {/* Messages */}
             <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto bg-gray-50">
-              <div className="space-y-4">
-                {activeMessages.map((msg) => (
+              {activeMessages.length === 0 && activeConversation ? (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <p className="text-sm">No messages yet. Start the conversation!</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {activeMessages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.isOwn ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
@@ -132,8 +138,9 @@ const ChatPage = () => {
                       </p>
                     </div>
                   </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Message Input */}
