@@ -230,11 +230,6 @@ const ProfilePage = () => {
                 <p className="text-2xl font-bold text-gray-900">{userProfile.totalSales}</p>
                 <p className="text-sm text-gray-500">Items Sold</p>
               </div>
-              
-              <div className="text-center">
-                <p className="text-2xl font-bold text-gray-900">{userProfile.totalPurchases}</p>
-                <p className="text-sm text-gray-500">Items Bought</p>
-              </div>
             </div>
           </div>
         </div>
