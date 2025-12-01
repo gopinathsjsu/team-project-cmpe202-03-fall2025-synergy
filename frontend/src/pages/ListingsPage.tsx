@@ -92,6 +92,12 @@ const ListingsPage = () => {
     return allProducts.filter((p) => {
       if (!p) return false
       
+      // Exclude sold items from main listings page
+      const status = p.status?.toUpperCase() || ''
+      if (status === 'SOLD') {
+        return false
+      }
+      
       // Category filter
       const matchesCategory = category === 'All' || p.category === category
       

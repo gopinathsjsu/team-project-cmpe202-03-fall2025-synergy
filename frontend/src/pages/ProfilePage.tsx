@@ -318,20 +318,22 @@ const ProfilePage = () => {
                             listing.status === 'active' || listing.status === 'ACTIVE'
                               ? 'bg-green-100 text-green-800' 
                               : listing.status === 'sold' || listing.status === 'SOLD'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-blue-100 text-blue-800 font-bold'
                               : 'bg-gray-100 text-gray-800'
                           }`}>
-                            {listing.status || 'active'}
+                            {listing.status === 'SOLD' || listing.status === 'sold' ? 'SOLD' : (listing.status || 'active').toUpperCase()}
                           </span>
-                          <button 
-                            className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                              e.stopPropagation()
-                              navigate(`/listings/${listing.id}/edit`)
-                            }}
-                          >
-                            Edit
-                          </button>
+                          {listing.status !== 'SOLD' && listing.status !== 'sold' && (
+                            <button 
+                              className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                e.stopPropagation()
+                                navigate(`/listings/${listing.id}/edit`)
+                              }}
+                            >
+                              Edit
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>

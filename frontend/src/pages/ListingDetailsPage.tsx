@@ -5,6 +5,7 @@ import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
 import { api } from '../lib/api'
 import { getCurrentUserId } from '../utils/auth'
+import { Toast } from '../components/Toast'
 
 const ListingDetailsPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -18,6 +19,8 @@ const ListingDetailsPage = () => {
   const [reporting, setReporting] = useState(false)
   const [reportError, setReportError] = useState<string>('')
   const [reportSuccess, setReportSuccess] = useState(false)
+  const [toast, setToast] = useState<{ message: string; type?: 'error' | 'success' | 'info' } | null>(null)
+  const [selling, setSelling] = useState(false)
 
   const handleChatWithSeller = async () => {
     if (!product) return
@@ -150,6 +153,34 @@ const ListingDetailsPage = () => {
     fetchProduct()
   }, [id, location.state])
 
+  const handleMarkAsSold = async () => {
+    if (!product || !id) return
+
+    // Confirm action
+    if (!window.confirm('Are you sure you want to mark this listing as sold? It will be removed from the listings page.')) {
+      return
+    }
+
+    try {
+      setSelling(true)
+      const updatedProduct = await productApi.markAsSold(Number(id))
+      setProduct(updatedProduct)
+      setToast({ message: 'Listing marked as sold.', type: 'success' })
+      
+      // Optionally redirect after a short delay
+      setTimeout(() => {
+        navigate('/profile', { replace: false })
+      }, 2000)
+    } catch (err: unknown) {
+      console.error('Error marking listing as sold:', err)
+      const error = err as { response?: { data?: { error?: string } }; message?: string }
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to mark listing as sold. Please try again.'
+      setToast({ message: errorMessage, type: 'error' })
+    } finally {
+      setSelling(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -226,12 +257,14 @@ const ListingDetailsPage = () => {
                 </span>
               )}
               {product.status && (
-                <span className={`px-3 py-1 rounded-full ${
-                  product.status === 'ACTIVE' 
+                <span className={`px-3 py-1 rounded-full font-medium ${
+                  product.status === 'ACTIVE' || product.status === 'active'
                     ? 'bg-green-100 text-green-800' 
+                    : product.status === 'SOLD' || product.status === 'sold'
+                    ? 'bg-blue-100 text-blue-800 font-bold'
                     : 'bg-gray-100 text-gray-800'
                 }`}>
-                  {product.status}
+                  {product.status === 'SOLD' || product.status === 'sold' ? 'SOLD' : product.status}
                 </span>
               )}
             </div>
@@ -258,21 +291,42 @@ const ListingDetailsPage = () => {
         </div>
 
         <div className="space-y-4">
-          {/* Show Edit button if user is the seller */}
+          {/* Show Edit and Sell buttons if user is the seller */}
           {(() => {
             const currentUserId = getCurrentUserId()
             const sellerId = product.sellerId || product.seller_id
-            return sellerId && currentUserId && Number(sellerId) === Number(currentUserId)
+            const isSeller = sellerId && currentUserId && Number(sellerId) === Number(currentUserId)
+            const isSold = product.status === 'SOLD' || product.status === 'sold'
+            return isSeller
           })() && (
-            <div className="card">
-              <button 
-                onClick={() => navigate(`/listings/${product.id}/edit`)}
-                className="btn-primary w-full flex items-center justify-center space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>Edit Listing</span>
-              </button>
-            </div>
+            <>
+              {(() => {
+                const isSold = product.status === 'SOLD' || product.status === 'sold'
+                return !isSold
+              })() && (
+                <>
+                  <div className="card">
+                    <button 
+                      onClick={() => navigate(`/listings/${product.id}/edit`)}
+                      className="btn-primary w-full flex items-center justify-center space-x-2"
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span>Edit Listing</span>
+                    </button>
+                  </div>
+                  <div className="card">
+                    <button 
+                      onClick={handleMarkAsSold}
+                      disabled={selling}
+                      className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <CheckCircle className="h-4 w-4" />
+                      <span>{selling ? 'Marking as Sold...' : 'Mark as Sold'}</span>
+                    </button>
+                  </div>
+                </>
+              )}
+            </>
           )}
 
           <div className="card space-y-3">
@@ -418,6 +472,15 @@ const ListingDetailsPage = () => {
             )}
           </div>
         </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
       )}
     </div>
   )
