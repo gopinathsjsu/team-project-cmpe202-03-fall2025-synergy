@@ -9,6 +9,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 })
 
 // Create axios instance with auth interceptor
@@ -17,6 +18,7 @@ export const authAxios = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 second timeout
 })
 
 // Add request interceptor to attach token
@@ -39,13 +41,30 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  // Log request for debugging
+  console.log('[API Request]', config.method?.toUpperCase(), config.url, {
+    baseURL: config.baseURL,
+    fullURL: `${config.baseURL}${config.url}`
+  })
   return config
 })
 
 // Handle response errors
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('[API Response]', response.status, response.config.url)
+    return response
+  },
   (error) => {
+    console.error('[API Error]', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      message: error.message,
+      code: error.code,
+      data: error.response?.data
+    })
+    
     if (error.response?.status === 401) {
       // Token expired or invalid
       localStorage.removeItem('token')
@@ -100,39 +119,75 @@ export interface User {
 
 export const authApi = {
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register', data)
-    const authResponse = response.data
-    
-    // Store auth data
-    const user: UserProfile = {
-      id: authResponse.id,
-      username: authResponse.username,
-      email: authResponse.email,
-      firstName: authResponse.firstName || '',
-      lastName: authResponse.lastName || '',
-      status: 'ACTIVE',
+    try {
+      const response = await api.post<AuthResponse>('/auth/register', data)
+      const authResponse = response.data
+      
+      // Store auth data
+      const user: UserProfile = {
+        id: authResponse.id,
+        username: authResponse.username,
+        email: authResponse.email,
+        firstName: authResponse.firstName || '',
+        lastName: authResponse.lastName || '',
+        status: 'ACTIVE',
+      }
+      storeAuthData(authResponse.token, user)
+      
+      return authResponse
+    } catch (error: unknown) {
+      const err = error as { 
+        response?: { 
+          status?: number
+          data?: { error?: string } 
+        }
+        message?: string
+        code?: string
+      }
+      
+      // Re-throw with better error message for network errors
+      if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED' || !err.response) {
+        throw new Error('Network error: Cannot connect to backend. Please make sure the backend is running on port 8080.')
+      }
+      
+      throw error
     }
-    storeAuthData(authResponse.token, user)
-    
-    return authResponse
   },
 
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', data)
-    const authResponse = response.data
-    
-    // Store auth data
-    const user: UserProfile = {
-      id: authResponse.id,
-      username: authResponse.username,
-      email: authResponse.email,
-      firstName: authResponse.firstName || '',
-      lastName: authResponse.lastName || '',
-      status: 'ACTIVE',
+    try {
+      const response = await api.post<AuthResponse>('/auth/login', data)
+      const authResponse = response.data
+      
+      // Store auth data
+      const user: UserProfile = {
+        id: authResponse.id,
+        username: authResponse.username,
+        email: authResponse.email,
+        firstName: authResponse.firstName || '',
+        lastName: authResponse.lastName || '',
+        status: 'ACTIVE',
+      }
+      storeAuthData(authResponse.token, user)
+      
+      return authResponse
+    } catch (error: unknown) {
+      const err = error as { 
+        response?: { 
+          status?: number
+          data?: { error?: string } 
+        }
+        message?: string
+        code?: string
+      }
+      
+      // Re-throw with better error message for network errors
+      if (err.code === 'ERR_NETWORK' || err.code === 'ECONNREFUSED' || !err.response) {
+        throw new Error('Network error: Cannot connect to backend. Please make sure the backend is running on port 8080.')
+      }
+      
+      throw error
     }
-    storeAuthData(authResponse.token, user)
-    
-    return authResponse
   },
   
   logout: () => {

@@ -70,9 +70,36 @@ const RegisterPage = () => {
       // Redirect to home page
       navigate('/')
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { error?: string } } };
-      setError(error.response?.data?.error || 'Registration failed. Please try again.')
       console.error('Registration error:', err)
+      const error = err as { 
+        response?: { 
+          status?: number
+          data?: { error?: string } 
+        }
+        message?: string
+        code?: string
+      }
+      
+      let errorMessage = 'Registration failed. Please try again.'
+      
+      // Handle network errors
+      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED' || !error.response) {
+        errorMessage = 'Cannot connect to server. Please make sure the backend is running on port 8080.'
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response.data?.error || 'Invalid registration data. Please check your input.'
+      } else if (error.response?.status === 409) {
+        errorMessage = error.response.data?.error || 'Username or email already exists. Please use different credentials.'
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Registration endpoint not found. Please check if the backend is running.'
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.'
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

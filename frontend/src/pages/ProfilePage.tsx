@@ -10,7 +10,6 @@ interface UserProfile {
   avatar: string
   joinDate: string
   totalSales: number
-  totalPurchases: number
 }
 
 const ProfilePage = () => {
@@ -64,7 +63,6 @@ const ProfilePage = () => {
         const totalSales = Array.isArray(listings) 
           ? listings.filter(p => p && (p.status === 'sold' || p.status === 'SOLD')).length 
           : 0
-        const totalPurchases = 0 // This would need to be tracked separately in the backend
         
         // Format join date (using current date as placeholder since User model doesn't have createdAt)
         const joinDate = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -79,8 +77,7 @@ const ProfilePage = () => {
           email: user.email || '',
           avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=6366f1&color=fff&size=100`,
           joinDate: joinDate,
-          totalSales,
-          totalPurchases
+          totalSales
         })
 
       } catch (err: unknown) {

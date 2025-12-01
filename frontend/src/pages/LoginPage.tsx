@@ -65,9 +65,34 @@ const LoginPage = () => {
       // Redirect to the page they were trying to access, or home page
       navigate(from, { replace: true })
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { error?: string } } };
-      setError(error.response?.data?.error || 'Login failed. Please check your credentials.')
       console.error('Login error:', err)
+      const error = err as { 
+        response?: { 
+          status?: number
+          data?: { error?: string } 
+        }
+        message?: string
+        code?: string
+      }
+      
+      let errorMessage = 'Login failed. Please check your credentials.'
+      
+      // Handle network errors
+      if (error.code === 'ERR_NETWORK' || error.code === 'ECONNREFUSED' || !error.response) {
+        errorMessage = 'Cannot connect to server. Please make sure the backend is running on port 8080.'
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        errorMessage = error.response.data?.error || 'Invalid email or password. Please try again.'
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Login endpoint not found. Please check if the backend is running.'
+      } else if (error.response?.status === 500) {
+        errorMessage = 'Server error. Please try again later.'
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
