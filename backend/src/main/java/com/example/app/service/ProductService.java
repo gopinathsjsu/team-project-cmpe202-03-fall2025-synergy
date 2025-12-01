@@ -6,8 +6,6 @@ import com.example.app.repository.ProductRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +15,6 @@ import java.util.List;
 
 @Service
 public class ProductService {
-    
-    private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
     
     @Autowired
     private ProductRepository productRepository;
@@ -335,61 +331,10 @@ public class ProductService {
     
     /**
      * Delete a product
-     * Also deletes related messages, chats, and reports to avoid foreign key constraint violations
-     * Deletion order: messages -> chats -> reports -> product
      */
-    @Transactional
     public void deleteProduct(Long id) {
         Product product = getProductById(id);
-        
-        // Step 1: Delete messages for chats that reference this product
-        // This must be done first because messages reference chats
-        try {
-            String deleteMessagesSql = 
-                "DELETE FROM messages " +
-                "WHERE chat_id IN (SELECT id FROM chats WHERE product_id = :productId)";
-            Query deleteMessagesQuery = entityManager.createNativeQuery(deleteMessagesSql);
-            deleteMessagesQuery.setParameter("productId", id);
-            int messagesDeleted = deleteMessagesQuery.executeUpdate();
-            if (messagesDeleted > 0) {
-                logger.info("Deleted {} messages for chats related to product {}", messagesDeleted, id);
-            }
-        } catch (Exception e) {
-            logger.warn("Could not delete related messages for product {}: {}", id, e.getMessage());
-        }
-        
-        // Step 2: Delete chats that reference this product
-        // This must be done before deleting the product
-        try {
-            String deleteChatsSql = "DELETE FROM chats WHERE product_id = :productId";
-            Query deleteChatsQuery = entityManager.createNativeQuery(deleteChatsSql);
-            deleteChatsQuery.setParameter("productId", id);
-            int chatsDeleted = deleteChatsQuery.executeUpdate();
-            if (chatsDeleted > 0) {
-                logger.info("Deleted {} chats related to product {}", chatsDeleted, id);
-            }
-        } catch (Exception e) {
-            logger.warn("Could not delete related chats for product {}: {}", id, e.getMessage());
-        }
-        
-        // Step 3: Delete related reports to avoid foreign key constraint violations
-        try {
-            String deleteReportsSql = "DELETE FROM reports WHERE product_id = :productId";
-            Query deleteReportsQuery = entityManager.createNativeQuery(deleteReportsSql);
-            deleteReportsQuery.setParameter("productId", id);
-            int reportsDeleted = deleteReportsQuery.executeUpdate();
-            if (reportsDeleted > 0) {
-                logger.info("Deleted {} reports related to product {}", reportsDeleted, id);
-            }
-        } catch (Exception e) {
-            // If reports table doesn't exist or query fails, log and continue
-            // This allows deletion to proceed even if reports table is missing
-            logger.warn("Could not delete related reports for product {}: {}", id, e.getMessage());
-        }
-        
-        // Step 4: Delete the product
         productRepository.delete(product);
-        logger.info("Product {} deleted successfully", id);
     }
     
     /**
