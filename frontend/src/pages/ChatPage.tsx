@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Send, MessageCircle } from "lucide-react";
 import { useChat } from "../context/chatContext";
 import { Avatar } from "../components/Avatar";
+import { ProductTag } from "../components/ProductTag";
 
 const ChatPage = () => {
   const {
@@ -80,12 +81,20 @@ const ChatPage = () => {
                     <div className="flex items-center space-x-3">
                       <Avatar name={conversation.user} className="w-10 h-10" />
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between mb-1">
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {conversation.user}
                           </p>
                           <p className="text-xs text-gray-500">{conversation.timestamp}</p>
                         </div>
+                        {conversation.productName && conversation.productId && (
+                          <div className="mb-1">
+                            <ProductTag 
+                              name={conversation.productName} 
+                              productId={conversation.productId}
+                            />
+                          </div>
+                        )}
                         <p className="text-sm text-gray-600 truncate">
                           {conversation.lastMessage || "No messages yet"}
                         </p>
@@ -106,16 +115,24 @@ const ChatPage = () => {
           <div className="flex-1 flex flex-col">
             {/* Chat Header */}
             <div className="p-4 border-b border-gray-200 bg-white">
-              <div className="flex items-center space-x-3">
-                {activeConversation && (
-                  <Avatar name={activeConversation.user} className="w-8 h-8" />
-                )}
-                <div>
-                  <h4 className="font-medium text-gray-900">
-                    {activeConversation?.user ?? "Select a conversation"}
-                  </h4>
-                  <p className="text-sm text-gray-500">Online</p>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  {activeConversation && (
+                    <Avatar name={activeConversation.user} className="w-8 h-8" />
+                  )}
+                  <div>
+                    <h4 className="font-medium text-gray-900">
+                      {activeConversation?.user ?? "Select a conversation"}
+                    </h4>
+                    <p className="text-sm text-gray-500">Online</p>
+                  </div>
                 </div>
+                {activeConversation?.productName && activeConversation?.productId && (
+                  <ProductTag 
+                    name={activeConversation.productName} 
+                    productId={activeConversation.productId}
+                  />
+                )}
               </div>
             </div>
 

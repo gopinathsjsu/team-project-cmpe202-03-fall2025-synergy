@@ -9,6 +9,8 @@ export interface Conversation {
   avatar: string;
   otherUserId?: number; // Store the other user's ID for sending messages
   messages?: Message[]; // Store messages for this conversation
+  productId?: number; // Product ID for this conversation
+  productName?: string; // Product name for this conversation
 }
 
 export interface Message {

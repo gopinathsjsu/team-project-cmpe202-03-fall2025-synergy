@@ -14,10 +14,12 @@ import com.example.app.dto.StartMessageRequest;
 import com.example.app.dto.startChatRequest;
 import com.example.app.model.Chat;
 import com.example.app.model.Messages;
+import com.example.app.model.Product;
 import com.example.app.model.User;
 import com.example.app.repository.ChatRepository;
 import com.example.app.repository.MessagesRepository;
 import com.example.app.repository.UserRepository;
+import com.example.app.repository.ProductRepository;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -34,6 +36,8 @@ public class ChatService {
   private final MessagesRepository mr;
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private ProductRepository productRepository;
 
   public ChatService(ChatRepository cr, MessagesRepository mr) {
     this.cr = cr;
@@ -86,11 +90,14 @@ public class ChatService {
       .orElseThrow(() -> new RuntimeException("Buyer not found"));
     User seller = userRepository.findById(chat.getSellerId())
       .orElseThrow(() -> new RuntimeException("Seller not found"));
+    Product product = productRepository.findById(chat.getProductId())
+      .orElseThrow(() -> new RuntimeException("Product not found"));
     
     String buyerName = formatUserName(buyer);
     String sellerName = formatUserName(seller);
+    String productName = product.getName();
     
-    return ChatDTO.fromChat(chat, buyerName, sellerName);
+    return ChatDTO.fromChat(chat, buyerName, sellerName, productName);
   }
   
   private String formatUserName(User user) {
@@ -205,9 +212,13 @@ public class ChatService {
   }
   
   /**
-   * Get conversations with user names for a user
+   * Get conversations with user names and product names for a user
    */
   public List<ChatDTO> myConversationsWithNames(Long userId) {
+    if (userId == null) {
+      throw new IllegalArgumentException("User ID cannot be null");
+    }
+    
     List<Chat> chats = myConversations(userId);
     return chats.stream()
       .map(chat -> {
@@ -216,14 +227,25 @@ public class ChatService {
             .orElse(null);
           User seller = userRepository.findById(chat.getSellerId())
             .orElse(null);
+          Product product = productRepository.findById(chat.getProductId())
+            .orElse(null);
           
-          String buyerName = buyer != null ? formatUserName(buyer) : "Unknown";
-          String sellerName = seller != null ? formatUserName(seller) : "Unknown";
+          String buyerName = buyer != null ? formatUserName(buyer) : "User " + chat.getBuyerId();
+          String sellerName = seller != null ? formatUserName(seller) : "User " + chat.getSellerId();
+          String productName = product != null && product.getName() != null 
+            ? product.getName() 
+            : "Product " + chat.getProductId();
           
-          return ChatDTO.fromChat(chat, buyerName, sellerName);
+          return ChatDTO.fromChat(chat, buyerName, sellerName, productName);
         } catch (Exception e) {
-          // Fallback if user lookup fails
-          return ChatDTO.fromChat(chat, "User " + chat.getBuyerId(), "User " + chat.getSellerId());
+          logger.error("Error building ChatDTO for chat {}: {}", chat.getId(), e.getMessage(), e);
+          // Fallback if lookup fails
+          return ChatDTO.fromChat(
+            chat, 
+            "User " + chat.getBuyerId(), 
+            "User " + chat.getSellerId(), 
+            "Product " + chat.getProductId()
+          );
         }
       })
       .toList();

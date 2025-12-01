@@ -136,6 +136,8 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
           unread: 0,
           avatar: "",
           otherUserId: otherUserId,
+          productId: c.chat.productId,
+          productName: c.chat.productName,
           messages: c.messages?.map((m): Message => {
             const senderName = m.senderId === currentUserId ? "You" : otherUserName;
             const sentAt = m.sentAt ?? new Date().toISOString();

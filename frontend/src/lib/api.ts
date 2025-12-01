@@ -33,11 +33,12 @@ export type startChatRequest = StartChatRequestDTO;
 
 export type Chat = {
   id: number;
+  productId: number;
+  productName: string;
   buyerId: number;
   buyerName: string;
   sellerId: number;
   sellerName: string;
-  productId: number;
   createdAt?: string;
   updatedAt?: string | null;
 };
