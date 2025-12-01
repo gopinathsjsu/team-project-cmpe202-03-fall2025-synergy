@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Trash2 } from 'lucide-react'
 import { adminApi, type AdminListingRow } from '../services/api'
+import { Toast } from '../../components/Toast'
 
 interface Listing {
   id: string
@@ -38,6 +40,8 @@ export default function Listings() {
   const [items, setItems] = useState<Listing[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; type?: 'error' | 'success' | 'info' } | null>(null)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
 
   const fetchListings = async () => {
     try {
@@ -66,6 +70,40 @@ export default function Listings() {
   }, [items])
 
   const list = items.filter(l => (categoryFilter === 'ALL' ? true : l.category === categoryFilter))
+
+  const handleDelete = async (listingId: number, productName: string) => {
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${productName}"?\n\nThis action cannot be undone.`
+    )
+    
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      setDeletingId(listingId)
+      await adminApi.deleteListing(listingId)
+      
+      // Remove from UI immediately
+      setItems(prevItems => prevItems.filter(item => item.id !== listingId.toString()))
+      
+      setToast({ 
+        message: `Listing "${productName}" has been deleted successfully.`, 
+        type: 'success' 
+      })
+    } catch (err: unknown) {
+      console.error('Failed to delete listing:', err)
+      const error = err as { response?: { data?: { error?: string } }; message?: string }
+      const message = error?.response?.data?.error || error?.message || 'Failed to delete listing. Please try again.'
+      setToast({ 
+        message: `Error: ${message}`, 
+        type: 'error' 
+      })
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   return (
     <div>
@@ -99,23 +137,42 @@ export default function Listings() {
                 <th className="p-2 text-right">Price</th>
                 <th className="p-2 text-left">Seller ID</th>
                 <th className="p-2 text-left">Created</th>
+                <th className="p-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               {list.map(l => (
-                <tr key={l.id} className="border-t">
+                <tr key={l.id} className="border-t hover:bg-gray-50">
                   <td className="p-2">{l.product}</td>
                   <td className="p-2">{l.category}</td>
                   <td className="p-2">{l.condition}</td>
                   <td className="p-2 text-right font-medium">{l.price}</td>
                   <td className="p-2">{l.sellerId}</td>
                   <td className="p-2">{l.createdAt}</td>
+                  <td className="p-2 text-center">
+                    <button
+                      onClick={() => handleDelete(parseInt(l.id), l.product)}
+                      disabled={deletingId === parseInt(l.id)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      title="Delete listing"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      {deletingId === parseInt(l.id) ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         )}
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }

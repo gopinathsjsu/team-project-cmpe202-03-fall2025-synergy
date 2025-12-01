@@ -161,9 +161,21 @@ public class ProductController {
      * Delete a product
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        try {
+            logger.info("DELETE /api/products/{} - Deleting product", id);
+            productService.deleteProduct(id);
+            logger.info("Product {} deleted successfully", id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            logger.error("Error deleting product {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Unexpected error deleting product {}: {}", id, e.getMessage(), e);
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", "Failed to delete product: " + e.getMessage()));
+        }
     }
 }
 
