@@ -2,7 +2,6 @@
 
 Complete set of text-based wireframes for all screens in the application.
 
----
 
 ## 1. Home Page
 
@@ -11,7 +10,7 @@ Complete set of text-based wireframes for all screens in the application.
 **Purpose:** Landing page showcasing marketplace, featured products, and category navigation
 
 **Wireframe (ASCII Layout):**
-```
+
 ┌─────────────────────────────────────────────────────────────────┐
 │ [Navbar: Logo | Search Bar | Browse | Sell | Messages | Profile]│
 ├─────────────────────────────────────────────────────────────────┤
@@ -37,7 +36,6 @@ Complete set of text-based wireframes for all screens in the application.
 │  [Browse All Listings →]                                        │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```
 
 **Main Components:**
 - Navbar (with logo, search, navigation links)
@@ -64,8 +62,6 @@ Complete set of text-based wireframes for all screens in the application.
 - Featured products load from API
 - Responsive grid layout
 
----
-
 ## 2. Login Page
 
 **Screen Name:** Login Page  
@@ -73,12 +69,11 @@ Complete set of text-based wireframes for all screens in the application.
 **Purpose:** User authentication to access protected features
 
 **Wireframe (ASCII Layout):**
-```
 ┌─────────────────────────────────────────────────────────────────┐
 │ [Navbar: Logo | Search Bar | Browse | Login]                    │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│                                                                   │
+│                                                                 │
+│                                                                 │
 │                    ┌─────────────────────┐                      │
 │                    │   Welcome Back      │                      │
 │                    │ Sign in to continue │                      │
@@ -90,19 +85,18 @@ Complete set of text-based wireframes for all screens in the application.
 │                    │                     │                      │
 │                    │ [Lock Icon]         │                      │
 │                    │ Password            │                      │
-│                    │ [________________]  │ [Eye Icon]          │
+│                    │ [________________]  │ [Eye Icon]           │
 │                    │                     │                      │
 │                    │ [ ] Remember me     │                      │
 │                    │                     │                      │
 │                    │ [    Sign in    ]   │                      │
 │                    │                     │                      │
 │                    │ Don't have account? │                      │
-│                    │ Create one now     │                      │
+│                    │ Create one now     │                       │
 │                    └─────────────────────┘                      │
-│                                                                   │
-│                                                                   │
+│                                                                 │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```
 
 **Main Components:**
 - Navbar (minimal, with login link)
@@ -132,8 +126,6 @@ Complete set of text-based wireframes for all screens in the application.
 - Shows error messages for invalid credentials
 - Admin login: admin@campusmarket.com / admin123
 
----
-
 ## 3. Register Page
 
 **Screen Name:** Register Page  
@@ -145,43 +137,42 @@ Complete set of text-based wireframes for all screens in the application.
 ┌─────────────────────────────────────────────────────────────────┐
 │ [Navbar: Logo | Search Bar | Browse | Login]                    │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│                                                                   │
-│                  ┌─────────────────────┐                       │
+│                                                                 │
+│                                                                 │
+│                  ┌─────────────────────┐                        │
 │                  │ Create your account  │                       │
 │                  │ Or sign in to        │                       │
 │                  │ existing account     │                       │
-│                  ├─────────────────────┤                       │
-│                  │                     │                       │
-│                  │ [User Icon]         │                       │
-│                  │ First Name          │                       │
-│                  │ [________________]  │                       │
-│                  │                     │                       │
-│                  │ [User Icon]         │                       │
-│                  │ Last Name           │                       │
-│                  │ [________________]  │                       │
-│                  │                     │                       │
-│                  │ [Mail Icon]         │                       │
-│                  │ Email Address       │                       │
-│                  │ [________________]  │                       │
-│                  │                     │                       │
-│                  │ [Lock Icon]         │                       │
-│                  │ Password            │                       │
-│                  │ [________________]  │ [Eye Icon]           │
-│                  │                     │                       │
-│                  │ [Lock Icon]         │                       │
-│                  │ Confirm Password    │                       │
-│                  │ [________________]  │ [Eye Icon]           │
-│                  │                     │                       │
-│                  │ [   Create Account   ]                      │
-│                  │                     │                       │
-│                  │ Already have account?│                      │
-│                  │ Sign in             │                       │
-│                  └─────────────────────┘                       │
-│                                                                   │
-│                                                                   │
+│                  ├─────────────────────┤                        │
+│                  │                     │                        │
+│                  │ [User Icon]         │                        │
+│                  │ First Name          │                        │
+│                  │ [________________]  │                        │
+│                  │                     │                        │
+│                  │ [User Icon]         │                        │
+│                  │ Last Name           │                        │
+│                  │ [________________]  │                        │
+│                  │                     │                        │
+│                  │ [Mail Icon]         │                        │
+│                  │ Email Address       │                        │
+│                  │ [________________]  │                        │
+│                  │                     │                        │
+│                  │ [Lock Icon]         │                        │
+│                  │ Password            │                        │
+│                  │ [________________]  │ [Eye Icon]             │
+│                  │                     │                        │
+│                  │ [Lock Icon]         │                        │
+│                  │ Confirm Password    │                        │ 
+│                  │ [________________]  │ [Eye Icon]             │
+│                  │                     │                        │
+│                  │ [   Create Account   ]                       │
+│                  │                     │                        │
+│                  │ Already have account?│                       │
+│                  │ Sign in             │                        │ 
+│                  └─────────────────────┘                        │
+│                                                                 │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
-```
 
 **Main Components:**
 - Navbar
@@ -211,7 +202,6 @@ Complete set of text-based wireframes for all screens in the application.
 - Shows error messages for validation failures
 - Auto-generates username from email if not provided
 
----
 
 ## 4. Listings Page
 
@@ -224,38 +214,38 @@ Complete set of text-based wireframes for all screens in the application.
 ┌─────────────────────────────────────────────────────────────────┐
 │ [Navbar: Logo | Search | Browse | Sell | Messages | Profile]    │
 ├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  Browse All Listings                                             │
-│  Find great deals on textbooks, electronics, and more            │
-│                                                                   │
-│  ┌──────────────┐  ┌──────────────────────────────────────┐   │
-│  │              │  │  Search & Filters                    │   │
-│  │  FILTERS     │  │  ────────────────────────────────────│   │
-│  │              │  │                                      │   │
-│  │  Category    │  │  [Search Icon] [Search Input]       │   │
-│  │  [Dropdown] │  │                                      │   │
-│  │              │  │  Results: 25 listings                │   │
-│  │  Price Range │  │                                      │   │
-│  │  Min: [___]  │  │  ┌────────┐ ┌────────┐ ┌────────┐  │   │
-│  │  Max: [___]  │  │  │[Image] │ │[Image] │ │[Image] │  │   │
-│  │              │  │  │Product │ │Product │ │Product │  │   │
-│  │  [Clear]     │  │  │$XX.XX  │ │$XX.XX  │ │$XX.XX  │  │   │
-│  │              │  │  │[ACTIVE]│ │[ACTIVE]│ │[SOLD]  │  │   │
-│  │  [Clear All] │  │  │[View]  │ │[View]  │ │[View]  │  │   │
-│  │              │  │  └────────┘ └────────┘ └────────┘  │   │
-│  │              │  │                                      │   │
-│  │              │  │  ┌────────┐ ┌────────┐ ┌────────┐  │   │
-│  │              │  │  │[Image] │ │[Image] │ │[Image] │  │   │
-│  │              │  │  │Product │ │Product │ │Product │  │   │
-│  │              │  │  │$XX.XX  │ │$XX.XX  │ │$XX.XX  │  │   │
-│  │              │  │  │[ACTIVE]│ │[ACTIVE]│ │[ACTIVE]│  │   │
-│  │              │  │  │[View]  │ │[View]  │ │[View]  │  │   │
-│  │              │  │  └────────┘ └────────┘ └────────┘  │   │
-│  │              │  │                                      │   │
-│  │              │  │  [< Previous] [1] [2] [3] [Next >] │   │
-│  │              │  │  Show: [10 ▼] per page              │   │
-│  └──────────────┘  └──────────────────────────────────────┘   │
-│                                                                   │
+│                                                                 │
+│  Browse All Listings                                            │
+│  Find great deals on textbooks, electronics, and more           │
+│                                                                 │
+│  ┌──────────────┐  ┌──────────────────────────────────────┐     │
+│  │              │  │  Search & Filters                    │     │
+│  │  FILTERS     │  │  ────────────────────────────────────│     │
+│  │              │  │                                      │     │
+│  │  Category    │  │  [Search Icon] [Search Input]        │     │
+│  │  [Dropdown] │  │                                       │     │
+│  │              │  │  Results: 25 listings                │     │
+│  │  Price Range │  │                                      │     │
+│  │  Min: [___]  │  │  ┌────────┐ ┌────────┐ ┌────────┐    │     │
+│  │  Max: [___]  │  │  │[Image] │ │[Image] │ │[Image] │    │     │
+│  │              │  │  │Product │ │Product │ │Product │    │     │
+│  │  [Clear]     │  │  │$XX.XX  │ │$XX.XX  │ │$XX.XX  │    │     │
+│  │              │  │  │[ACTIVE]│ │[ACTIVE]│ │[SOLD]  │    │     │
+│  │  [Clear All] │  │  │[View]  │ │[View]  │ │[View]  │    │     │
+│  │              │  │  └────────┘ └────────┘ └────────┘    │     │
+│  │              │  │                                      │     │
+│  │              │  │  ┌────────┐ ┌────────┐ ┌────────┐    │     │
+│  │              │  │  │[Image] │ │[Image] │ │[Image] │    │     │
+│  │              │  │  │Product │ │Product │ │Product │    │     │
+│  │              │  │  │$XX.XX  │ │$XX.XX  │ │$XX.XX  │    │     │
+│  │              │  │  │[ACTIVE]│ │[ACTIVE]│ │[ACTIVE]│    │     │
+│  │              │  │  │[View]  │ │[View]  │ │[View]  │    │     │
+│  │              │  │  └────────┘ └────────┘ └────────┘    │     │
+│  │              │  │                                      │     │
+│  │              │  │  [< Previous] [1] [2] [3] [Next >]   │     │
+│  │              │  │  Show: [10 ▼] per page               │     │  
+│  └──────────────┘  └──────────────────────────────────────┘     │
+│                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -293,8 +283,6 @@ Complete set of text-based wireframes for all screens in the application.
 - Responsive: 1 col mobile, 2 cols tablet, 3 cols desktop
 - Shows match percentage for semantic search results
 
----
-
 ## 5. Listing Details Page
 
 **Screen Name:** Listing Details Page  
@@ -302,7 +290,7 @@ Complete set of text-based wireframes for all screens in the application.
 **Purpose:** View detailed information about a specific product listing
 
 **Wireframe (ASCII Layout):**
-```
+
 ┌─────────────────────────────────────────────────────────────────┐
 │ [Navbar: Logo | Search | Browse | Sell | Messages | Profile]    │
 ├─────────────────────────────────────────────────────────────────┤
