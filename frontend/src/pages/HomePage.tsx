@@ -123,9 +123,12 @@ const HomePage = () => {
                 className="card hover:shadow-md transition-shadow cursor-pointer block"
               >
                 <img
-                  src={product.imageUrl || 'https://placehold.co/300x200?text=No+Image'}
+                  src={product.imageUrl}
                   alt={product.name}
-                  className="w-full h-48 object-cover rounded-lg mb-4"
+                  className="h-48 w-full object-cover rounded-lg mb-4"
+                  onError={(e) => { 
+                    e.currentTarget.src = "/placeholder.png"; 
+                  }}
                 />
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>

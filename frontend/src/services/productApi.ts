@@ -128,12 +128,12 @@ export const productApi = {
     if (limit) params.append('limit', limit.toString())
     
     const response = await api.get<Product[]>(`/products/search?${params.toString()}`)
-    return response.data
+    return response.data.map(normalizeProduct)
   },
 
   getActive: async (): Promise<Product[]> => {
     const response = await api.get<Product[]>('/products/active')
-    return response.data
+    return response.data.map(normalizeProduct)
   },
 
   /**
@@ -148,7 +148,7 @@ export const productApi = {
         status: response.status,
         count: response.data?.length || 0
       })
-      return response.data
+      return response.data.map(normalizeProduct)
     } catch (error: unknown) {
       const err = error as { message?: string; response?: { status?: number }; config?: { url?: string } };
       console.error('[productApi] ❌ Error fetching all products:', {
@@ -172,7 +172,7 @@ export const productApi = {
 
   getBySeller: async (sellerId: number): Promise<Product[]> => {
     const response = await api.get<Product[]>(`/products/seller/${sellerId}`)
-    return response.data
+    return response.data.map(normalizeProduct)
   },
 
   create: async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product> => {

@@ -32,6 +32,12 @@ const ListingsPage = () => {
       try {
         const products = await productApi.getAll()
         console.log('[ListingsPage] Received products:', products.length)
+        // Debug: Log image URLs to see what we're getting
+        products.forEach((p, idx) => {
+          if (idx < 3) { // Log first 3 products for debugging
+            console.log(`[ListingsPage] Product ${p.id} (${p.name}): imageUrl =`, p.imageUrl || 'NULL/EMPTY')
+          }
+        })
         setAllProducts(products)
       } catch (err: unknown) {
         console.error('[ListingsPage] Error fetching products:', err)
@@ -133,6 +139,7 @@ const ListingsPage = () => {
   const startIndex = Math.max(0, currentPage * pageSize)
   const endIndex = Math.min(startIndex + pageSize, totalElements)
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex)
+  console.log(paginatedProducts)
 
   useEffect(() => {
     setCategory(paramCategory)
@@ -447,11 +454,17 @@ const ListingsPage = () => {
                     {/* Image Container */}
                     <div className="relative overflow-hidden bg-gray-100">
                       <img 
-                        src={p.imageUrl || 'https://placehold.co/400x300?text=No+Image'} 
+                        src={p.imageUrl ? p.imageUrl : "/placeholder.png"} 
                         alt={p.name || 'Product'} 
                         className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300" 
                         onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                          (e.target as HTMLImageElement).src = 'https://placehold.co/400x300?text=No+Image'
+                          console.warn(`[ListingsPage] Failed to load image for product ${p.id} (${p.name}):`, p.imageUrl)
+                          (e.target as HTMLImageElement).src = '/placeholder.png'
+                        }}
+                        onLoad={() => {
+                          if (p.imageUrl) {
+                            console.log(`[ListingsPage] Successfully loaded image for product ${p.id}:`, p.imageUrl)
+                          }
                         }}
                       />
                       {/* Status Badge */}

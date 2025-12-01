@@ -299,11 +299,11 @@ const ProfilePage = () => {
                       onClick={() => navigate(`/listings/${listing.id}`)}
                     >
                       <img
-                        src={listing.imageUrl || 'https://via.placeholder.com/200x150?text=No+Image'}
+                        src={listing.imageUrl ? listing.imageUrl : "/placeholder.png"}
                         alt={listing.name}
                         className="w-full h-48 object-cover"
                         onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                          (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x150?text=No+Image'
+                          (e.target as HTMLImageElement).src = '/placeholder.png'
                         }}
                       />
                       <div className="p-4">

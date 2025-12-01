@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Upload, X, DollarSign, Tag } from 'lucide-react'
+import { Upload, X, DollarSign, Tag, Loader2 } from 'lucide-react'
 import { productApi } from '../services/productApi'
+import { imageApi } from '../services/imageApi'
 
 const CreateListingPage = () => {
   const navigate = useNavigate()
@@ -13,6 +14,8 @@ const CreateListingPage = () => {
     condition: 'good'
   })
   const [images, setImages] = useState<File[]>([])
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('')
+  const [uploadingImage, setUploadingImage] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>('')
 
@@ -34,14 +37,20 @@ const CreateListingPage = () => {
     { value: 'poor', label: 'Poor' }
   ]
 
-  // Convert image file to base64 data URL
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader()
-      reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = (error) => reject(error)
-    })
+  // Upload image to S3
+  const uploadImageToS3 = async (file: File, category: string): Promise<string> => {
+    try {
+      setUploadingImage(true)
+      const imageUrl = await imageApi.uploadImage(file, category)
+      setUploadedImageUrl(imageUrl)
+      return imageUrl
+    } catch (err) {
+      console.error('Error uploading image to S3:', err)
+      const error = err as { response?: { data?: { error?: string } }; message?: string }
+      throw new Error(error.response?.data?.error || error.message || 'Failed to upload image')
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -65,26 +74,19 @@ const CreateListingPage = () => {
         return
       }
 
-      // Convert first image to base64 if available
-      // Note: Base64 images can be very long, so we'll use a placeholder for now
-      // In production, you should upload images to a file storage service (S3, etc.)
+      // Upload image to S3 if available
       let imageUrl: string | undefined = undefined
       if (images.length > 0) {
         try {
-          // For now, we'll use a data URL but note that it may be too long for the database
-          // Consider implementing proper image upload to a file storage service
-          const base64 = await fileToBase64(images[0])
-          // Limit to reasonable size (e.g., 1MB base64 = ~1.3MB original)
-          // If too long, we'll skip it and use a placeholder
-          if (base64.length > 1000000) { // ~1MB limit
-            console.warn('Image too large, skipping base64 encoding')
-            imageUrl = undefined // Will be set to null in database
-          } else {
-            imageUrl = base64
-          }
+          // Upload first image to S3
+          imageUrl = await uploadImageToS3(images[0], formData.category)
+          console.log('Image uploaded to S3:', imageUrl)
         } catch (err) {
-          console.error('Error converting image:', err)
-          // Continue without image if conversion fails
+          console.error('Error uploading image:', err)
+          const error = err as Error
+          setError(error.message || 'Failed to upload image. Please try again.')
+          setLoading(false)
+          return
         }
       }
 
@@ -121,9 +123,38 @@ const CreateListingPage = () => {
     })
   }
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    setImages([...images, ...files])
+    if (files.length > 0) {
+      // Only allow one image for now
+      const file = files[0]
+      
+      // Validate file size (10MB max)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image size must be less than 10MB')
+        return
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('File must be an image')
+        return
+      }
+      
+      setImages([file])
+      setUploadedImageUrl('') // Reset uploaded URL
+      setError('')
+      
+      // Auto-upload to S3 if category is selected
+      if (formData.category) {
+        try {
+          await uploadImageToS3(file, formData.category)
+        } catch (err) {
+          console.error('Auto-upload failed:', err)
+          // Don't show error here, user can still submit and upload will happen on submit
+        }
+      }
+    }
   }
 
   const removeImage = (index: number) => {
@@ -248,47 +279,71 @@ const CreateListingPage = () => {
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Photos *
+              Photo {uploadingImage && <span className="text-blue-600">(Uploading...)</span>}
             </label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <Upload className="mx-auto h-12 w-12 text-gray-400" />
-              <div className="mt-4">
-                <label htmlFor="images" className="btn-primary cursor-pointer">
-                  Upload Photos
-                </label>
-                <input
-                  id="images"
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
-                <p className="mt-2 text-sm text-gray-500">
-                  Upload up to 10 photos (PNG, JPG, GIF)
-                </p>
-              </div>
+              {uploadingImage ? (
+                <div className="flex flex-col items-center">
+                  <Loader2 className="h-12 w-12 text-blue-600 animate-spin mb-4" />
+                  <p className="text-sm text-gray-600">Uploading image to S3...</p>
+                </div>
+              ) : (
+                <>
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="mt-4">
+                    <label htmlFor="images" className="btn-primary cursor-pointer">
+                      Upload Photo
+                    </label>
+                    <input
+                      id="images"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage || loading}
+                    />
+                    <p className="mt-2 text-sm text-gray-500">
+                      Upload a photo (PNG, JPG, GIF - Max 10MB)
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Image Preview */}
             {images.length > 0 && (
-              <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
-                {images.map((image, index) => (
-                  <div key={index} className="relative">
+              <div className="mt-4">
+                <div className="relative inline-block">
+                  {uploadedImageUrl ? (
                     <img
-                      src={URL.createObjectURL(image)}
-                      alt={`Preview ${index + 1}`}
-                      className="w-full h-32 object-cover rounded-lg"
+                      src={uploadedImageUrl}
+                      alt="Uploaded preview"
+                      className="w-full max-w-md h-64 object-cover rounded-lg border-2 border-green-500"
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
+                  ) : (
+                    <img
+                      src={URL.createObjectURL(images[0])}
+                      alt="Preview"
+                      className="w-full max-w-md h-64 object-cover rounded-lg"
+                    />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImages([])
+                      setUploadedImageUrl('')
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    disabled={uploadingImage}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                  {uploadedImageUrl && (
+                    <div className="absolute bottom-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
+                      ✓ Uploaded to S3
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

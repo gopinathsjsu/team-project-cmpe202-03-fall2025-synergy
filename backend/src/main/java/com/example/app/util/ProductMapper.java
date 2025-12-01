@@ -10,6 +10,7 @@ public class ProductMapper {
     
     /**
      * Convert Product entity to ProductResponseDto
+     * Ensures imageUrl is set based on category if not already present
      */
     public static ProductResponseDto toResponseDto(Product product) {
         if (product == null) {
@@ -24,7 +25,15 @@ public class ProductMapper {
         dto.setCategory(product.getCategory());
         dto.setCondition(product.getCondition());
         dto.setSellerId(product.getSellerId());
-        dto.setImageUrl(product.getImageUrl());
+        
+        // Ensure imageUrl is set - use existing if valid, otherwise generate from category
+        String imageUrl = S3ImageUrlGenerator.ensureImageUrl(
+            product.getImageUrl(), 
+            product.getCategory(), 
+            product.getId()
+        );
+        dto.setImageUrl(imageUrl);
+        
         dto.setStatus(product.getStatus());
         dto.setCreatedAt(product.getCreatedAt());
         dto.setUpdatedAt(product.getUpdatedAt());

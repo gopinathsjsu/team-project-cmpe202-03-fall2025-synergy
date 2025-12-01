@@ -38,6 +38,7 @@ public class SecurityConfig {
                 .requestMatchers("/users/**").permitAll()
                 .requestMatchers("/products/**").permitAll()
                 .requestMatchers("/listings/**").permitAll()
+                .requestMatchers("/images/**").permitAll()
 
                 // Admin & error endpoints
                 .requestMatchers("/admin/**").permitAll()

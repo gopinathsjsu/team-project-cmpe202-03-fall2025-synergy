@@ -235,7 +235,7 @@ const ListingDetailsPage = () => {
         <div className="lg:col-span-2">
           <div className="card mb-4">
             <img 
-              src={product.imageUrl || 'https://placehold.co/800x400?text=No+Image'} 
+              src={product.imageUrl ? product.imageUrl : "/placeholder.png"} 
               alt={product.name} 
               className="w-full h-80 object-cover rounded-lg" 
             />

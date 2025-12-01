@@ -1,0 +1,19 @@
+# Root .gitignore
+
+# AWS Credentials (if stored in files)
+**/application-local.yml
+**/application-secrets.yml
+setup-aws-credentials.sh
+setup-aws-credentials.ps1
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+

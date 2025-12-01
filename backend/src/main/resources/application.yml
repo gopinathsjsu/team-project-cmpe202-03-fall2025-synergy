@@ -1,6 +1,12 @@
 spring:
   application:
     name: campus-marketplace
+  # Configure multipart file upload limits
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
   
   datasource:
     # Support environment variables: SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD
@@ -28,6 +34,8 @@ server:
   port: 8080
   servlet:
     context-path: /api
+  # Increase file upload size limits
+  max-http-header-size: 16KB
 
 logging:
   level:
@@ -42,3 +50,13 @@ jwt:
 embeddings:
   service:
     url: http://localhost:8001
+
+aws:
+  s3:
+    bucket-name: spartan-exchange-s3
+    region: us-east-1
+  # AWS credentials
+  # ⚠️ SECURITY WARNING: These credentials are in the config file
+  # For production, use environment variables instead
+  access-key-id: AKIA2ONKSSNW6AJGPORZ
+  secret-access-key: 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
