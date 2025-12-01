@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { adminApi, type AdminReportRow } from '../services/api'
 import type { ReportStatus } from '../services/mockData'
+import { Trash2 } from 'lucide-react'
 
 interface ReportRow {
   id: string
   productId: string
+  productName: string
   listingId: string
   reason: string
   status: ReportStatus
@@ -20,6 +22,7 @@ const normalizeStatus = (status?: string | null): ReportStatus => {
 const mapReport = (row: AdminReportRow): ReportRow => ({
   id: row.id.toString(),
   productId: row.product_id != null ? row.product_id.toString() : '—',
+  productName: row.product_name ?? '—',
   listingId: row.listing_id != null ? row.listing_id.toString() : '—',
   reason: row.reason ?? '—',
   status: normalizeStatus(row.status),
@@ -58,6 +61,23 @@ export default function Reports() {
 
   const list = items.filter(r => (statusFilter === 'ALL' ? true : r.status === statusFilter))
 
+  const handleDeleteReport = async (reportId: string) => {
+    if (!confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      await adminApi.deleteReport(Number(reportId))
+      // Remove the deleted report from the list
+      setItems(items.filter(item => item.id !== reportId))
+    } catch (err: unknown) {
+      console.error('Failed to delete report:', err)
+      const error = err as { response?: { data?: { error?: string } }; message?: string }
+      const message = error?.response?.data?.error || error?.message || 'Failed to delete report. Please try again.'
+      alert(message)
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
@@ -86,10 +106,12 @@ export default function Reports() {
               <tr className="bg-gray-50">
                 <th className="p-2 text-left">Report</th>
                 <th className="p-2 text-left">Product ID</th>
+                <th className="p-2 text-left">Product Name</th>
                 <th className="p-2 text-left">Listing ID</th>
                 <th className="p-2 text-left">Reason</th>
                 <th className="p-2 text-left">Status</th>
                 <th className="p-2 text-left">Created</th>
+                <th className="p-2 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -97,10 +119,20 @@ export default function Reports() {
                 <tr key={r.id} className="border-t">
                   <td className="p-2">{r.id}</td>
                   <td className="p-2">{r.productId}</td>
+                  <td className="p-2">{r.productName}</td>
                   <td className="p-2">{r.listingId}</td>
                   <td className="p-2">{r.reason}</td>
                   <td className="p-2">{r.status}</td>
                   <td className="p-2">{r.createdAt}</td>
+                  <td className="p-2">
+                    <button
+                      onClick={() => handleDeleteReport(r.id)}
+                      className="text-red-600 hover:text-red-800 hover:bg-red-50 p-1.5 rounded transition-colors"
+                      title="Delete report"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

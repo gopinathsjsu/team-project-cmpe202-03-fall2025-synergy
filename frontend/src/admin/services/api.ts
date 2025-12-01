@@ -46,6 +46,7 @@ export interface AdminReportRow {
   id: number
   product_id?: number | null
   listing_id?: number | null
+  product_name?: string | null
   reason?: string | null
   status?: string | null
   [key: string]: unknown
@@ -78,6 +79,10 @@ export const adminApi = {
 
   deleteListing: async (listingId: number): Promise<void> => {
     await api.delete(`/products/${listingId}`)
+  },
+
+  deleteReport: async (reportId: number): Promise<void> => {
+    await api.delete(`/admin/reports/${reportId}`)
   },
 }
 

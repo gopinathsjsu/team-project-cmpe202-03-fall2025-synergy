@@ -4,7 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -91,8 +93,27 @@ public class AdminController {
 
     @GetMapping("/reports")
     public ResponseEntity<List<Map<String, Object>>> getReports() {
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
-                "SELECT * FROM reports ORDER BY id DESC");
+        // Join with products table to get product name
+        String query = "SELECT r.*, p.name as product_name " +
+                "FROM reports r " +
+                "LEFT JOIN products p ON r.product_id = p.id " +
+                "ORDER BY r.id DESC";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(query);
         return ResponseEntity.ok(rows);
+    }
+
+    @DeleteMapping("/reports/{id}")
+    public ResponseEntity<Map<String, String>> deleteReport(@PathVariable Long id) {
+        try {
+            int deleted = jdbcTemplate.update("DELETE FROM reports WHERE id = ?", id);
+            if (deleted > 0) {
+                return ResponseEntity.ok(Map.of("message", "Report deleted successfully"));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("error", "Failed to delete report: " + e.getMessage()));
+        }
     }
 }

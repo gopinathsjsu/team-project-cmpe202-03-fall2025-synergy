@@ -257,5 +257,18 @@ export const productApi = {
       }
     }
   },
+
+  /**
+   * Report a listing
+   * @param productId ID of the product to report
+   * @param reason Reason for reporting
+   */
+  report: async (productId: number, reason: string): Promise<void> => {
+    const response = await api.post('/reports', {
+      productId,
+      reason
+    })
+    return response.data
+  },
 }
 

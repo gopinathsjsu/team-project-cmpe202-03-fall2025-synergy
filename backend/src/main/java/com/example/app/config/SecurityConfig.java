@@ -52,6 +52,9 @@ public class SecurityConfig {
                 .requestMatchers("/chat/start").authenticated()
                 .requestMatchers("/chat/*/message").authenticated()
 
+                // Report endpoints (require authentication)
+                .requestMatchers("/reports").authenticated()
+
                 // For now allow everything else (you can change to authenticated() later)
                 .anyRequest().permitAll()
             )
