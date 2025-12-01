@@ -10,51 +10,27 @@
 
 The objective of Sprint 1 was to establish the **foundation** of the Campus Marketplace project by:
 
-- Finalizing the technology stack and repository structure  
+- Finalizing the technology stack and project structure  
 - Setting up frontend and backend scaffolding  
-- Designing complete UI wireframes for all screens  
+- Designing complete UI wireframes  
 - Creating the initial PostgreSQL database schema  
 - Implementing a basic homepage using mock API data  
-- Establishing GitHub workflow and Scrum processes  
+- Establishing GitHub workflow and Scrum practices  
 
-This sprint focuses entirely on building the groundwork needed for future feature development.
+This sprint focuses entirely on setting up the groundwork needed for future development.
 
----
+# 2. Sprint 1 Backlog (User Stories)
 
-# 2. Team Members & Component Ownership
-
-| Team Member                | GitHub Handle              | Ownership / Core Contributions |
-|----------------------------|----------------------------|--------------------------------|
-| **Sriyavarma Saripella**   | `sriyavarmasaripella`      | Buyer-facing UI: homepage, product details, featured listings, future search UI, S3 images |
-| **Mohit Reddy**            | `mohitreddyamanaganti`     | Backend APIs (listing CRUD), admin flows, seller flows, full UI wireframes, routing fixes |
-| **Dokala Yaswanth**        | `Dokala Yaswanth`          | Chat system, chatbot research, chat UX design, product → chat linking |
-| **Siddharth Jetling**      | `Siddharth Jetling`        | Database schema design, semantic search design, backend search and filter planning |
-
-
----
-
-# 3. Sprint 1 Backlog (User Stories)
-
-### User Stories
-
-1. **US-1:** As a buyer, I want to browse featured listings  
-2. **US-2:** As a seller, I need to know what information is required to create a listing  
-3. **US-3:** As a buyer, I want to view product details  
-4. **US-4:** As a team, we need a complete database schema  
-5. **US-5:** As a team, we need a basic API returning mock data  
-6. **US-6:** As a team, we need full UI wireframes for all screens  
-7. **US-7:** As a team, we must establish project structure and Git workflow  
-
-### Sprint 1 Completion Summary
-
-| User Story | Status |
-|------------|--------|
-| US-4 | ✅ Completed |
-| US-5 | ✅ Completed |
-| US-6 | ✅ Completed |
-| US-7 | ✅ Completed |
-| US-1 | ⚠️ Completed using mock API (real data in Sprint 2) |
-| US-3 | ⚠️ Static UI + routing completed |
+| User Story ID | User Story                                                                                           | Task                                                                           | Status      |
+|---------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------|
+| **US-1**      | As a developer, I need a clean and consistent project structure so the team can develop in parallel. | Initialize repository & project folders                                        | ✔ Completed |
+| **US-2**      | As a backend engineer, I need a functioning Spring Boot service to start building APIs.              | Scaffold Spring Boot backend                                                   | ✔ Completed |
+|               |                                                                                                       | Set up listings API base structure                                             | ✔ Completed |
+| **US-3**      | As a frontend engineer, I need a working UI framework with routing.                                   | Scaffold Vite + React project                                                  | ✔ Completed |
+|               |                                                                                                       | Configure React Router & create placeholder pages                              | ✔ Completed |
+| **US-4**      | As an admin, I need an initial dashboard layout so I can begin overseeing marketplace activity.       | Build admin dashboard UI skeleton                                              | ✔ Completed |
+| **US-5**      | As a team, we need shared state management for consistent behavior across components.                 | Create and integrate React contexts                                            | ✔ Completed |
+| **US-6**      | As a backend engineer, I need database connectivity to begin storing listings and user data.          | Initial DB setup & connectivity testing                                        | ✔ Completed |
 
 ---
 
@@ -68,23 +44,24 @@ Below is the **visual representation** of the Sprint 1 workflow and progress.
 
 ### Sprint 1 Task Board (Kanban Style)
 ## 4.1 Sprint 1 Task Board (Sticky-Note Kanban)
+## 4.1 Sprint 1 Task Board (Color-Coded Kanban with User Story IDs)
 
-| **TO DO**                                                   | **DOING**                                                          | **DONE**                                                                   |
-|-------------------------------------------------------------|---------------------------------------------------------------------|-----------------------------------------------------------------------------|
-| 🟥 Define seller listing requirements (US-2)                | 🟩 Homepage UI development (Sriya – US-1)                          | 🟦 Project repo structure setup (Mohit)                                    |
-| 🟪 Define product details fields for item view (US-3 prep)  | 🟪 Product Details UI development (Sriya – US-3)                   | 🟩 Express backend skeleton: `/api/health`, `/api/listings` (Mohit)        |
-| 🟩 Finalize DB attribute list (Siddharth)                   | 🟥 Chat UI & flow design (Yaswanth)                                | 🟦 Initial PostgreSQL schema (Users, Listings, Messages) (Siddharth)       |
-|                                                             | 🟦 Semantic search planning (Siddharth)                             | 🟪 Final UI wireframes for all screens completed (Mohit)                   |
-|                                                             |                                                                     | 🟦 Homepage integrated with mock API data (Sriya + Mohit)                  |
-|                                                             |                                                                     | 🟩 Product details routing created with params (Sriya)                     |
-|                                                             |                                                                     | 🟪 Initial chatbot research & plan completed (Yaswanth)                    |
-
+| **TO DO**                                                                                  | **DOING**                                                                  | **DONE**                                                                                     |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 🟥 Define seller listing requirements (US-2)                                                | 🟩 Homepage UI development (Sriya – based on US-3)                          | 🟦 Project repository & folder structure initialized (US-1)                                   |
+| 🟪 Define product details fields for item view (US-3 prep)                                  | 🟪 Product Details UI layout & routing (Sriya – US-3)                       | 🟦 Spring Boot backend scaffolded (US-2)                                                      |
+| 🟥 Prepare API routes needed for Sprint 2 (supports US-2, US-3, US-6)                       | 🟥 Chat UI skeleton & message flow design (Yaswanth)                        | 🟦 Listings API base structure created (US-2)                                                 |
+| 🟩 Finalize DB attribute list (US-6 – Siddharth)                                            | 🟦 Semantic search & filter planning (Siddharth – US-6 extension)           | 🟦 Initial PostgreSQL schema drafted (Users, Listings, Messages) – (US-6)                     |
+| 🟪 Prepare chatbot interaction plan (future chat work)                                      |                                                                             | 🟪 Full UI wireframes for all screens completed (US-5)                                        |
+|                                                                                            |                                                                             | 🟩 Homepage integrated with mock API data (Sriya + Mohit – US-3 support)                      |
+|                                                                                            |                                                                             | 🟩 Product details routing created with params (Sriya – US-3)                                  |
+|                                                                                            |                                                                             | 🟪 Initial chatbot research & direction completed (Yaswanth)                                   |
 
 
 ### Interpretation
-- All foundational tasks moved to **DONE**
-- Homepage and product details UI moved **In Progress → Review → Done**
-- Chat + semantic search planning done (implementation postponed to Sprint 2)
+- All core Sprint 1 user stories (US-1 → US-6) moved to Done.
+- Chat planning and semantic search remained In Progress and will continue in Sprint 2.
+- All frontend and backend scaffolding tasks reached Done.
 
 ---
 
@@ -96,7 +73,1260 @@ Below is the **visual representation** of the Sprint 1 workflow and progress.
 | US-2 | Seller listing requirements | Backlog | Done |
 | US-3 | Product details page | Backlog | Review → Done |
 | US-4 | Database schema design | To Do | Done |
-| US-5 | Mock API skeleton | To Do | Done |
+| US-5 | Mock API skeleton | To Do | Done |# Sprint 1 – Campus Marketplace (Spartan Exchange)
+
+**Sprint Duration:** September 8, 2025 – September 21, 2025  
+**Sprint Length:** 2 Weeks  
+**Team:** CMPE 202 – Spartan Exchange  
+
+---
+
+# 1. Sprint Goal
+
+The objective of Sprint 1 was to establish the **foundation** of the Campus Marketplace project by:
+
+- Finalizing the technology stack and project structure  
+- Setting up frontend and backend scaffolding  
+- Designing complete UI wireframes  
+- Creating the initial PostgreSQL database schema  
+- Implementing a basic homepage using mock API data  
+- Establishing GitHub workflow and Scrum practices  
+
+This sprint focuses entirely on setting up the groundwork needed for future development.
+
+# 2. Sprint 1 Backlog (User Stories)
+
+| User Story ID | User Story                                                                                           | Task                                                                           | Status      |
+|---------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------|
+| **US-1**      | As a developer, I need a clean and consistent project structure so the team can develop in parallel. | Initialize repository & project folders                                        | ✔ Completed |
+| **US-2**      | As a backend engineer, I need a functioning Spring Boot service to start building APIs.              | Scaffold Spring Boot backend                                                   | ✔ Completed |
+|               |                                                                                                       | Set up listings API base structure                                             | ✔ Completed |
+| **US-3**      | As a frontend engineer, I need a working UI framework with routing.                                   | Scaffold Vite + React project                                                  | ✔ Completed |
+|               |                                                                                                       | Configure React Router & create placeholder pages                              | ✔ Completed |
+| **US-4**      | As an admin, I need an initial dashboard layout so I can begin overseeing marketplace activity.       | Build admin dashboard UI skeleton                                              | ✔ Completed |
+| **US-5**      | As a team, we need shared state management for consistent behavior across components.                 | Create and integrate React contexts                                            | ✔ Completed |
+| **US-6**      | As a backend engineer, I need database connectivity to begin storing listings and user data.          | Initial DB setup & connectivity testing                                        | ✔ Completed |
+
+---
+
+# 4. Task Board & Burndown Summary
+
+Below is the **visual representation** of the Sprint 1 workflow and progress.
+
+---
+
+## 4.1 Sprint 1 Task Board (Visual Kanban)
+
+### Sprint 1 Task Board (Kanban Style)
+## 4.1 Sprint 1 Task Board (Sticky-Note Kanban)
+## 4.1 Sprint 1 Task Board (Color-Coded Kanban with User Story IDs)
+
+| **TO DO**                                                                                  | **DOING**                                                                  | **DONE**                                                                                     |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 🟥 Define seller listing requirements (US-2)                                                | 🟩 Homepage UI development (Sriya – based on US-3)                          | 🟦 Project repository & folder structure initialized (US-1)                                   |
+| 🟪 Define product details fields for item view (US-3 prep)                                  | 🟪 Product Details UI layout & routing (Sriya – US-3)                       | 🟦 Spring Boot backend scaffolded (US-2)                                                      |
+| 🟥 Prepare API routes needed for Sprint 2 (supports US-2, US-3, US-6)                       | 🟥 Chat UI skeleton & message flow design (Yaswanth)                        | 🟦 Listings API base structure created (US-2)                                                 |
+| 🟩 Finalize DB attribute list (US-6 – Siddharth)                                            | 🟦 Semantic search & filter planning (Siddharth – US-6 extension)           | 🟦 Initial PostgreSQL schema drafted (Users, Listings, Messages) – (US-6)                     |
+| 🟪 Prepare chatbot interaction plan (future chat work)                                      |                                                                             | 🟪 Full UI wireframes for all screens completed (US-5)                                        |
+|                                                                                            |                                                                             | 🟩 Homepage integrated with mock API data (Sriya + Mohit – US-3 support)                      |
+|                                                                                            |                                                                             | 🟩 Product details routing created with params (Sriya – US-3)                                  |
+|                                                                                            |                                                                             | 🟪 Initial chatbot research & direction completed (Yaswanth)                                   |
+
+
+### Interpretation
+- All core Sprint 1 user stories (US-1 → US-6) moved to Done.
+- Chat planning and semantic search remained In Progress and will continue in Sprint 2.
+- All frontend and backend scaffolding tasks reached Done.
+
+---
+
+## 4.1.1 User Story Movement Table
+
+## 4.1.1 User Story Movement Table
+
+| User Story | Description                                                                 | Start State | End State     |
+|-----------|-------------------------------------------------------------------------------|-------------|---------------|
+| US-1      | Clean and consistent project structure                                        | Backlog     | Done          |
+| US-2      | Backend Spring Boot setup + listings API                                      | Backlog     | Done          |
+| US-3      | Frontend scaffolding + React Router + placeholder pages                       | Backlog     | Done          |
+| US-4      | Admin dashboard initial layout                                                | To Do       | Done          |
+| US-5      | Shared state management via React Contexts                                    | To Do       | Done          |
+| US-6      | Database connectivity & initial PostgreSQL schema                             | To Do       | Done          |
+
+
+This fulfills **“Update the story on your Task Board.”**
+
+---
+
+## 4.2 Sprint 1 Burndown Chart (ASCII Representation)
+ | Day | Ideal SP | Actual SP | Progress Bar                   |
+| --- | -------- | --------- | ------------------------------ |
+| 1   | 26       | 28        | ██████████████████████████████ |
+| 2   | 24       | 28        | ██████████████████████████████ |
+| 3   | 22       | 26        | ████████████████████████████   |
+| 4   | 20       | 26        | ████████████████████████████   |
+| 5   | 18       | 24        | ██████████████████████████     |
+| 6   | 16       | 22        | ████████████████████████       |
+| 7   | 14       | 20        | ██████████████████████         |
+| 8   | 12       | 16        | ███████████████████            |
+| 9   | 10       | 14        | █████████████████              |
+| 10  | 8        | 12        | ███████████████                |
+| 11  | 6        | 8         | ████████████                   |
+| 12  | 4        | 6         | ██████████                     |
+| 13  | 2        | 2         | ████                           |
+| 14  | 0        | 0         |                                |
+
+
+
+### Interpretation
+- Week 1: Slow progress due to setup & architecture  
+- Week 2: Strong progress; majority of user stories completed  
+- Final SP = 0 → **Sprint Goal Achieved**
+
+This fulfills **“Track your team’s Burndown Chart.”**
+
+---
+
+# 5. Weekly Scrum Reports
+
+Each member’s weekly updates (Daily Scrum questions):
+
+**1. What tasks did I work on?**  
+**2. What am I planning to work on next?**  
+**3. What tasks are blocked?**  
+
+---
+
+## WEEK 1 (Sept 8 – Sept 14)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Built homepage UI elements and static featured listings 
+- Implemented general UI adjustments
+
+**2. Planning next**
+- Support backend with schema discussions
+- Connect remaining UI sections to backend APIs 
+
+**3. Blocked on**
+- Awaiting finalized API formats
+- Pending stable API responses from backend
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Built Admin Dashboard structure 
+- Updated browse, profile, and admin navigation pages 
+- Performed project cleanup and folder restructuring  
+
+**2. Planning next**
+- Extend admin moderation tools
+- Connect admin dashboard to backend endpoints
+
+**3. Blocked on**
+- Pending finalized schema for admin-related datasets
+- Awaiting consolidated DB schema for listings & users 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Designed and sketched chat page and message UI
+- Implemented initial chat routing and structure
+- Began outlining chat flow and interactions
+
+**2. Planning next**
+- Build full chat UI wireframe
+- Coordinate backend message flow and chat storage 
+
+**3. Blocked on**
+- Awaiting final messaging table/ERD
+- Need final messaging table structure and ERD approval
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Developed product filtering groundwork
+- Set up backend PostgreSQL basics
+- Created early search and filtering strategy 
+
+**2. Planning next**
+- Expand advanced filter logic
+- Align filter API with frontend consumption
+
+**3. Blocked on**
+- Waiting for backend API contract confirmation
+- Awaiting final approval of unified backend API contract 
+
+---
+
+## WEEK 2 (Sept 15 – Sept 21)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Integrated static UI pages with early backend structures
+- Added placeholder product details and homepage routing refinements
+- Updated general UI components to match overall layout direction
+- Provided support for frontend–backend alignment discussions
+
+**2. Planning next**
+- Begin wiring the homepage and product card data to real API responses
+- Assist in validating final database schema for listings
+- Start implementing seller-side UI wiring in Sprint 2
+
+**3. Blocked on**
+- Waiting on stable API endpoints to finalize UI data binding
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Extended Admin Dashboard structure with additional navigation panels
+- Updated admin-specific pages for viewing listings and managing content
+- Refined browse page and profile page, aligning with admin flow
+- Performed merge operations and code cleanup across frontend modules 
+
+**2. Planning next**
+- Implement admin moderation logic (approve, remove listings)
+- Coordinate with backend to consume report-related endpoints
+- Build initial report management table for admin UI
+
+**3. Blocked on**
+- Pending final listing/report schema from backend 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Integrated early backend directories and branch restoration for chat work
+- Implemented placeholder chat components and chat page structure 
+- Began initial message container logic (UI-level only)
+- Discussed message flow and session structure with backend team
+
+**2. Planning next**
+- Build message input flow and UI interactions
+- Prepare initial chat-to-API connection plan
+- Start designing chatbot interaction pane for Sprint 2 
+
+**3. Blocked on**
+- Messaging table structure and ERD finalization
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Implemented deeper product filtering logic in React 
+- Set up filtering state management and category mapping
+- Improved backend–filter interface planning
+- Updated backend PostgreSQL setup and adjusted listing model fields
+
+**2. Planning next**
+- Implement full filter API structure (category, price, keyword)
+- Start wiring backend filters to frontend dropdowns
+- Coordinate with Sriya for product card data formatting
+
+**3. Blocked on**
+- Waiting for finalized API response formatting definitions 
+
+---
+
+# 6. Sprint 1 Review
+
+### What We Planned:
+- Set up the project structure and tools
+- Create frontend and backend scaffolding 
+- Build initial UI wireframes
+- Begin designing the PostgreSQL schema
+- Implement a basic homepage using mock data 
+- Align team workflow, branching strategy, and sprint process
+
+### What We Completed:
+- Initialized Vite + React project
+- Scaffolded Spring Boot backend with listings API placeholder
+- Built homepage layout with mock listing cards
+- Created Admin Dashboard base layout
+- Added chat page routing and initial UI structure
+- Set up PostgreSQL connection and drafted early schema
+- Performed major repo cleanup and folder restructuring
+- Established consistent development workflow on GitHub
+ 
+### What Was Not Completed:
+- Authentication and role-based access
+- Full database schema (Listings, Users, Chat, Reports)
+- CRUD functionality for listings
+- Chat backend logic and chatbot integration
+- Search/filter backend implementation
+- Admin moderation flow
+
+### Summary of Sprint 1:
+- The team successfully completed all foundational tasks required to begin core feature development in Sprint 2.
+- The core structure of the project is now in place: UI routes, backend setup, early database work, and the basic marketplace layout.
+- Technical alignment was strong, and all members contributed to their respective functional areas.
+
+---
+
+# 7. Sprint 1 Retrospective
+
+### What Went Well
+- Smooth collaboration and communication across the team
+- Clean and well-organized project structure after setup
+- Clear division of work (filters, chat, admin, general UI)
+- UI wireframes helped guide Sprint 1 execution
+- All planned Sprint 1 items were completed on time
+
+### What Could Be Improved
+- Hosting decisions delayed backend progress  
+- Stories needed more detailed breakdown  
+- Blocking issues should be raised sooner  
+
+### Action Items for Sprint 2
+- Break down user stories into smaller tasks  
+- Finalize AWS hosting in Week 1 of Sprint 2  
+- Keep updating Task Board daily  
+- Formalize API contracts before implementing them  
+
+---
+
+**End of Sprint 1 Report**# Sprint 1 – Campus Marketplace (Spartan Exchange)
+
+**Sprint Duration:** September 8, 2025 – September 21, 2025  
+**Sprint Length:** 2 Weeks  
+**Team:** CMPE 202 – Spartan Exchange  
+
+---
+
+# 1. Sprint Goal
+
+The objective of Sprint 1 was to establish the **foundation** of the Campus Marketplace project by:
+
+- Finalizing the technology stack and project structure  
+- Setting up frontend and backend scaffolding  
+- Designing complete UI wireframes  
+- Creating the initial PostgreSQL database schema  
+- Implementing a basic homepage using mock API data  
+- Establishing GitHub workflow and Scrum practices  
+
+This sprint focuses entirely on setting up the groundwork needed for future development.
+
+# 2. Sprint 1 Backlog (User Stories)
+
+| User Story ID | User Story                                                                                           | Task                                                                           | Status      |
+|---------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------|
+| **US-1**      | As a developer, I need a clean and consistent project structure so the team can develop in parallel. | Initialize repository & project folders                                        | ✔ Completed |
+| **US-2**      | As a backend engineer, I need a functioning Spring Boot service to start building APIs.              | Scaffold Spring Boot backend                                                   | ✔ Completed |
+|               |                                                                                                       | Set up listings API base structure                                             | ✔ Completed |
+| **US-3**      | As a frontend engineer, I need a working UI framework with routing.                                   | Scaffold Vite + React project                                                  | ✔ Completed |
+|               |                                                                                                       | Configure React Router & create placeholder pages                              | ✔ Completed |
+| **US-4**      | As an admin, I need an initial dashboard layout so I can begin overseeing marketplace activity.       | Build admin dashboard UI skeleton                                              | ✔ Completed |
+| **US-5**      | As a team, we need shared state management for consistent behavior across components.                 | Create and integrate React contexts                                            | ✔ Completed |
+| **US-6**      | As a backend engineer, I need database connectivity to begin storing listings and user data.          | Initial DB setup & connectivity testing                                        | ✔ Completed |
+
+---
+
+# 4. Task Board & Burndown Summary
+
+Below is the **visual representation** of the Sprint 1 workflow and progress.
+
+---
+
+## 4.1 Sprint 1 Task Board (Visual Kanban)
+
+### Sprint 1 Task Board (Kanban Style)
+## 4.1 Sprint 1 Task Board (Sticky-Note Kanban)
+## 4.1 Sprint 1 Task Board (Color-Coded Kanban with User Story IDs)
+
+| **TO DO**                                                                                  | **DOING**                                                                  | **DONE**                                                                                     |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 🟥 Define seller listing requirements (US-2)                                                | 🟩 Homepage UI development (Sriya – based on US-3)                          | 🟦 Project repository & folder structure initialized (US-1)                                   |
+| 🟪 Define product details fields for item view (US-3 prep)                                  | 🟪 Product Details UI layout & routing (Sriya – US-3)                       | 🟦 Spring Boot backend scaffolded (US-2)                                                      |
+| 🟥 Prepare API routes needed for Sprint 2 (supports US-2, US-3, US-6)                       | 🟥 Chat UI skeleton & message flow design (Yaswanth)                        | 🟦 Listings API base structure created (US-2)                                                 |
+| 🟩 Finalize DB attribute list (US-6 – Siddharth)                                            | 🟦 Semantic search & filter planning (Siddharth – US-6 extension)           | 🟦 Initial PostgreSQL schema drafted (Users, Listings, Messages) – (US-6)                     |
+| 🟪 Prepare chatbot interaction plan (future chat work)                                      |                                                                             | 🟪 Full UI wireframes for all screens completed (US-5)                                        |
+|                                                                                            |                                                                             | 🟩 Homepage integrated with mock API data (Sriya + Mohit – US-3 support)                      |
+|                                                                                            |                                                                             | 🟩 Product details routing created with params (Sriya – US-3)                                  |
+|                                                                                            |                                                                             | 🟪 Initial chatbot research & direction completed (Yaswanth)                                   |
+
+
+### Interpretation
+- All core Sprint 1 user stories (US-1 → US-6) moved to Done.
+- Chat planning and semantic search remained In Progress and will continue in Sprint 2.
+- All frontend and backend scaffolding tasks reached Done.
+
+---
+
+## 4.1.1 User Story Movement Table
+
+## 4.1.1 User Story Movement Table
+
+| User Story | Description                                                                 | Start State | End State     |
+|-----------|-------------------------------------------------------------------------------|-------------|---------------|
+| US-1      | Clean and consistent project structure                                        | Backlog     | Done          |
+| US-2      | Backend Spring Boot setup + listings API                                      | Backlog     | Done          |
+| US-3      | Frontend scaffolding + React Router + placeholder pages                       | Backlog     | Done          |
+| US-4      | Admin dashboard initial layout                                                | To Do       | Done          |
+| US-5      | Shared state management via React Contexts                                    | To Do       | Done          |
+| US-6      | Database connectivity & initial PostgreSQL schema                             | To Do       | Done          |
+
+
+This fulfills **“Update the story on your Task Board.”**
+
+---
+
+## 4.2 Sprint 1 Burndown Chart (ASCII Representation)
+ | Day | Ideal SP | Actual SP | Progress Bar                   |
+| --- | -------- | --------- | ------------------------------ |
+| 1   | 26       | 28        | ██████████████████████████████ |
+| 2   | 24       | 28        | ██████████████████████████████ |
+| 3   | 22       | 26        | ████████████████████████████   |
+| 4   | 20       | 26        | ████████████████████████████   |
+| 5   | 18       | 24        | ██████████████████████████     |
+| 6   | 16       | 22        | ████████████████████████       |
+| 7   | 14       | 20        | ██████████████████████         |
+| 8   | 12       | 16        | ███████████████████            |
+| 9   | 10       | 14        | █████████████████              |
+| 10  | 8        | 12        | ███████████████                |
+| 11  | 6        | 8         | ████████████                   |
+| 12  | 4        | 6         | ██████████                     |
+| 13  | 2        | 2         | ████                           |
+| 14  | 0        | 0         |                                |
+
+
+
+### Interpretation
+- Week 1: Slow progress due to setup & architecture  
+- Week 2: Strong progress; majority of user stories completed  
+- Final SP = 0 → **Sprint Goal Achieved**
+
+This fulfills **“Track your team’s Burndown Chart.”**
+
+---
+
+# 5. Weekly Scrum Reports
+
+Each member’s weekly updates (Daily Scrum questions):
+
+**1. What tasks did I work on?**  
+**2. What am I planning to work on next?**  
+**3. What tasks are blocked?**  
+
+---
+
+## WEEK 1 (Sept 8 – Sept 14)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Built homepage UI elements and static featured listings 
+- Implemented general UI adjustments
+
+**2. Planning next**
+- Support backend with schema discussions
+- Connect remaining UI sections to backend APIs 
+
+**3. Blocked on**
+- Awaiting finalized API formats
+- Pending stable API responses from backend
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Built Admin Dashboard structure 
+- Updated browse, profile, and admin navigation pages 
+- Performed project cleanup and folder restructuring  
+
+**2. Planning next**
+- Extend admin moderation tools
+- Connect admin dashboard to backend endpoints
+
+**3. Blocked on**
+- Pending finalized schema for admin-related datasets
+- Awaiting consolidated DB schema for listings & users 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Designed and sketched chat page and message UI
+- Implemented initial chat routing and structure
+- Began outlining chat flow and interactions
+
+**2. Planning next**
+- Build full chat UI wireframe
+- Coordinate backend message flow and chat storage 
+
+**3. Blocked on**
+- Awaiting final messaging table/ERD
+- Need final messaging table structure and ERD approval
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Developed product filtering groundwork
+- Set up backend PostgreSQL basics
+- Created early search and filtering strategy 
+
+**2. Planning next**
+- Expand advanced filter logic
+- Align filter API with frontend consumption
+
+**3. Blocked on**
+- Waiting for backend API contract confirmation
+- Awaiting final approval of unified backend API contract 
+
+---
+
+## WEEK 2 (Sept 15 – Sept 21)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Integrated static UI pages with early backend structures
+- Added placeholder product details and homepage routing refinements
+- Updated general UI components to match overall layout direction
+- Provided support for frontend–backend alignment discussions
+
+**2. Planning next**
+- Begin wiring the homepage and product card data to real API responses
+- Assist in validating final database schema for listings
+- Start implementing seller-side UI wiring in Sprint 2
+
+**3. Blocked on**
+- Waiting on stable API endpoints to finalize UI data binding
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Extended Admin Dashboard structure with additional navigation panels
+- Updated admin-specific pages for viewing listings and managing content
+- Refined browse page and profile page, aligning with admin flow
+- Performed merge operations and code cleanup across frontend modules 
+
+**2. Planning next**
+- Implement admin moderation logic (approve, remove listings)
+- Coordinate with backend to consume report-related endpoints
+- Build initial report management table for admin UI
+
+**3. Blocked on**
+- Pending final listing/report schema from backend 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Integrated early backend directories and branch restoration for chat work
+- Implemented placeholder chat components and chat page structure 
+- Began initial message container logic (UI-level only)
+- Discussed message flow and session structure with backend team
+
+**2. Planning next**
+- Build message input flow and UI interactions
+- Prepare initial chat-to-API connection plan
+- Start designing chatbot interaction pane for Sprint 2 
+
+**3. Blocked on**
+- Messaging table structure and ERD finalization
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Implemented deeper product filtering logic in React 
+- Set up filtering state management and category mapping
+- Improved backend–filter interface planning
+- Updated backend PostgreSQL setup and adjusted listing model fields
+
+**2. Planning next**
+- Implement full filter API structure (category, price, keyword)
+- Start wiring backend filters to frontend dropdowns
+- Coordinate with Sriya for product card data formatting
+
+**3. Blocked on**
+- Waiting for finalized API response formatting definitions 
+
+---
+
+# 6. Sprint 1 Review
+
+### What We Planned:
+- Set up the project structure and tools
+- Create frontend and backend scaffolding 
+- Build initial UI wireframes
+- Begin designing the PostgreSQL schema
+- Implement a basic homepage using mock data 
+- Align team workflow, branching strategy, and sprint process
+
+### What We Completed:
+- Initialized Vite + React project
+- Scaffolded Spring Boot backend with listings API placeholder
+- Built homepage layout with mock listing cards
+- Created Admin Dashboard base layout
+- Added chat page routing and initial UI structure
+- Set up PostgreSQL connection and drafted early schema
+- Performed major repo cleanup and folder restructuring
+- Established consistent development workflow on GitHub
+ 
+### What Was Not Completed:
+- Authentication and role-based access
+- Full database schema (Listings, Users, Chat, Reports)
+- CRUD functionality for listings
+- Chat backend logic and chatbot integration
+- Search/filter backend implementation
+- Admin moderation flow
+
+### Summary of Sprint 1:
+- The team successfully completed all foundational tasks required to begin core feature development in Sprint 2.
+- The core structure of the project is now in place: UI routes, backend setup, early database work, and the basic marketplace layout.
+- Technical alignment was strong, and all members contributed to their respective functional areas.
+
+---
+
+# 7. Sprint 1 Retrospective
+
+### What Went Well
+- Smooth collaboration and communication across the team
+- Clean and well-organized project structure after setup
+- Clear division of work (filters, chat, admin, general UI)
+- UI wireframes helped guide Sprint 1 execution
+- All planned Sprint 1 items were completed on time
+
+### What Could Be Improved
+- Hosting decisions delayed backend progress  
+- Stories needed more detailed breakdown  
+- Blocking issues should be raised sooner  
+
+### Action Items for Sprint 2
+- Break down user stories into smaller tasks  
+- Finalize AWS hosting in Week 1 of Sprint 2  
+- Keep updating Task Board daily  
+- Formalize API contracts before implementing them  
+
+---
+
+**End of Sprint 1 Report**# Sprint 1 – Campus Marketplace (Spartan Exchange)
+
+**Sprint Duration:** September 8, 2025 – September 21, 2025  
+**Sprint Length:** 2 Weeks  
+**Team:** CMPE 202 – Spartan Exchange  
+
+---
+
+# 1. Sprint Goal
+
+The objective of Sprint 1 was to establish the **foundation** of the Campus Marketplace project by:
+
+- Finalizing the technology stack and project structure  
+- Setting up frontend and backend scaffolding  
+- Designing complete UI wireframes  
+- Creating the initial PostgreSQL database schema  
+- Implementing a basic homepage using mock API data  
+- Establishing GitHub workflow and Scrum practices  
+
+This sprint focuses entirely on setting up the groundwork needed for future development.
+
+# 2. Sprint 1 Backlog (User Stories)
+
+| User Story ID | User Story                                                                                           | Task                                                                           | Status      |
+|---------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------|
+| **US-1**      | As a developer, I need a clean and consistent project structure so the team can develop in parallel. | Initialize repository & project folders                                        | ✔ Completed |
+| **US-2**      | As a backend engineer, I need a functioning Spring Boot service to start building APIs.              | Scaffold Spring Boot backend                                                   | ✔ Completed |
+|               |                                                                                                       | Set up listings API base structure                                             | ✔ Completed |
+| **US-3**      | As a frontend engineer, I need a working UI framework with routing.                                   | Scaffold Vite + React project                                                  | ✔ Completed |
+|               |                                                                                                       | Configure React Router & create placeholder pages                              | ✔ Completed |
+| **US-4**      | As an admin, I need an initial dashboard layout so I can begin overseeing marketplace activity.       | Build admin dashboard UI skeleton                                              | ✔ Completed |
+| **US-5**      | As a team, we need shared state management for consistent behavior across components.                 | Create and integrate React contexts                                            | ✔ Completed |
+| **US-6**      | As a backend engineer, I need database connectivity to begin storing listings and user data.          | Initial DB setup & connectivity testing                                        | ✔ Completed |
+
+---
+
+# 4. Task Board & Burndown Summary
+
+Below is the **visual representation** of the Sprint 1 workflow and progress.
+
+---
+
+## 4.1 Sprint 1 Task Board (Visual Kanban)
+
+### Sprint 1 Task Board (Kanban Style)
+## 4.1 Sprint 1 Task Board (Sticky-Note Kanban)
+## 4.1 Sprint 1 Task Board (Color-Coded Kanban with User Story IDs)
+
+| **TO DO**                                                                                  | **DOING**                                                                  | **DONE**                                                                                     |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 🟥 Define seller listing requirements (US-2)                                                | 🟩 Homepage UI development (Sriya – based on US-3)                          | 🟦 Project repository & folder structure initialized (US-1)                                   |
+| 🟪 Define product details fields for item view (US-3 prep)                                  | 🟪 Product Details UI layout & routing (Sriya – US-3)                       | 🟦 Spring Boot backend scaffolded (US-2)                                                      |
+| 🟥 Prepare API routes needed for Sprint 2 (supports US-2, US-3, US-6)                       | 🟥 Chat UI skeleton & message flow design (Yaswanth)                        | 🟦 Listings API base structure created (US-2)                                                 |
+| 🟩 Finalize DB attribute list (US-6 – Siddharth)                                            | 🟦 Semantic search & filter planning (Siddharth – US-6 extension)           | 🟦 Initial PostgreSQL schema drafted (Users, Listings, Messages) – (US-6)                     |
+| 🟪 Prepare chatbot interaction plan (future chat work)                                      |                                                                             | 🟪 Full UI wireframes for all screens completed (US-5)                                        |
+|                                                                                            |                                                                             | 🟩 Homepage integrated with mock API data (Sriya + Mohit – US-3 support)                      |
+|                                                                                            |                                                                             | 🟩 Product details routing created with params (Sriya – US-3)                                  |
+|                                                                                            |                                                                             | 🟪 Initial chatbot research & direction completed (Yaswanth)                                   |
+
+
+### Interpretation
+- All core Sprint 1 user stories (US-1 → US-6) moved to Done.
+- Chat planning and semantic search remained In Progress and will continue in Sprint 2.
+- All frontend and backend scaffolding tasks reached Done.
+
+---
+
+## 4.1.1 User Story Movement Table
+
+## 4.1.1 User Story Movement Table
+
+| User Story | Description                                                                 | Start State | End State     |
+|-----------|-------------------------------------------------------------------------------|-------------|---------------|
+| US-1      | Clean and consistent project structure                                        | Backlog     | Done          |
+| US-2      | Backend Spring Boot setup + listings API                                      | Backlog     | Done          |
+| US-3      | Frontend scaffolding + React Router + placeholder pages                       | Backlog     | Done          |
+| US-4      | Admin dashboard initial layout                                                | To Do       | Done          |
+| US-5      | Shared state management via React Contexts                                    | To Do       | Done          |
+| US-6      | Database connectivity & initial PostgreSQL schema                             | To Do       | Done          |
+
+
+This fulfills **“Update the story on your Task Board.”**
+
+---
+
+## 4.2 Sprint 1 Burndown Chart (ASCII Representation)
+ | Day | Ideal SP | Actual SP | Progress Bar                   |
+| --- | -------- | --------- | ------------------------------ |
+| 1   | 26       | 28        | ██████████████████████████████ |
+| 2   | 24       | 28        | ██████████████████████████████ |
+| 3   | 22       | 26        | ████████████████████████████   |
+| 4   | 20       | 26        | ████████████████████████████   |
+| 5   | 18       | 24        | ██████████████████████████     |
+| 6   | 16       | 22        | ████████████████████████       |
+| 7   | 14       | 20        | ██████████████████████         |
+| 8   | 12       | 16        | ███████████████████            |
+| 9   | 10       | 14        | █████████████████              |
+| 10  | 8        | 12        | ███████████████                |
+| 11  | 6        | 8         | ████████████                   |
+| 12  | 4        | 6         | ██████████                     |
+| 13  | 2        | 2         | ████                           |
+| 14  | 0        | 0         |                                |
+
+
+
+### Interpretation
+- Week 1: Slow progress due to setup & architecture  
+- Week 2: Strong progress; majority of user stories completed  
+- Final SP = 0 → **Sprint Goal Achieved**
+
+This fulfills **“Track your team’s Burndown Chart.”**
+
+---
+
+# 5. Weekly Scrum Reports
+
+Each member’s weekly updates (Daily Scrum questions):
+
+**1. What tasks did I work on?**  
+**2. What am I planning to work on next?**  
+**3. What tasks are blocked?**  
+
+---
+
+## WEEK 1 (Sept 8 – Sept 14)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Built homepage UI elements and static featured listings 
+- Implemented general UI adjustments
+
+**2. Planning next**
+- Support backend with schema discussions
+- Connect remaining UI sections to backend APIs 
+
+**3. Blocked on**
+- Awaiting finalized API formats
+- Pending stable API responses from backend
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Built Admin Dashboard structure 
+- Updated browse, profile, and admin navigation pages 
+- Performed project cleanup and folder restructuring  
+
+**2. Planning next**
+- Extend admin moderation tools
+- Connect admin dashboard to backend endpoints
+
+**3. Blocked on**
+- Pending finalized schema for admin-related datasets
+- Awaiting consolidated DB schema for listings & users 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Designed and sketched chat page and message UI
+- Implemented initial chat routing and structure
+- Began outlining chat flow and interactions
+
+**2. Planning next**
+- Build full chat UI wireframe
+- Coordinate backend message flow and chat storage 
+
+**3. Blocked on**
+- Awaiting final messaging table/ERD
+- Need final messaging table structure and ERD approval
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Developed product filtering groundwork
+- Set up backend PostgreSQL basics
+- Created early search and filtering strategy 
+
+**2. Planning next**
+- Expand advanced filter logic
+- Align filter API with frontend consumption
+
+**3. Blocked on**
+- Waiting for backend API contract confirmation
+- Awaiting final approval of unified backend API contract 
+
+---
+
+## WEEK 2 (Sept 15 – Sept 21)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Integrated static UI pages with early backend structures
+- Added placeholder product details and homepage routing refinements
+- Updated general UI components to match overall layout direction
+- Provided support for frontend–backend alignment discussions
+
+**2. Planning next**
+- Begin wiring the homepage and product card data to real API responses
+- Assist in validating final database schema for listings
+- Start implementing seller-side UI wiring in Sprint 2
+
+**3. Blocked on**
+- Waiting on stable API endpoints to finalize UI data binding
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Extended Admin Dashboard structure with additional navigation panels
+- Updated admin-specific pages for viewing listings and managing content
+- Refined browse page and profile page, aligning with admin flow
+- Performed merge operations and code cleanup across frontend modules 
+
+**2. Planning next**
+- Implement admin moderation logic (approve, remove listings)
+- Coordinate with backend to consume report-related endpoints
+- Build initial report management table for admin UI
+
+**3. Blocked on**
+- Pending final listing/report schema from backend 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Integrated early backend directories and branch restoration for chat work
+- Implemented placeholder chat components and chat page structure 
+- Began initial message container logic (UI-level only)
+- Discussed message flow and session structure with backend team
+
+**2. Planning next**
+- Build message input flow and UI interactions
+- Prepare initial chat-to-API connection plan
+- Start designing chatbot interaction pane for Sprint 2 
+
+**3. Blocked on**
+- Messaging table structure and ERD finalization
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Implemented deeper product filtering logic in React 
+- Set up filtering state management and category mapping
+- Improved backend–filter interface planning
+- Updated backend PostgreSQL setup and adjusted listing model fields
+
+**2. Planning next**
+- Implement full filter API structure (category, price, keyword)
+- Start wiring backend filters to frontend dropdowns
+- Coordinate with Sriya for product card data formatting
+
+**3. Blocked on**
+- Waiting for finalized API response formatting definitions 
+
+---
+
+# 6. Sprint 1 Review
+
+### What We Planned:
+- Set up the project structure and tools
+- Create frontend and backend scaffolding 
+- Build initial UI wireframes
+- Begin designing the PostgreSQL schema
+- Implement a basic homepage using mock data 
+- Align team workflow, branching strategy, and sprint process
+
+### What We Completed:
+- Initialized Vite + React project
+- Scaffolded Spring Boot backend with listings API placeholder
+- Built homepage layout with mock listing cards
+- Created Admin Dashboard base layout
+- Added chat page routing and initial UI structure
+- Set up PostgreSQL connection and drafted early schema
+- Performed major repo cleanup and folder restructuring
+- Established consistent development workflow on GitHub
+ 
+### What Was Not Completed:
+- Authentication and role-based access
+- Full database schema (Listings, Users, Chat, Reports)
+- CRUD functionality for listings
+- Chat backend logic and chatbot integration
+- Search/filter backend implementation
+- Admin moderation flow
+
+### Summary of Sprint 1:
+- The team successfully completed all foundational tasks required to begin core feature development in Sprint 2.
+- The core structure of the project is now in place: UI routes, backend setup, early database work, and the basic marketplace layout.
+- Technical alignment was strong, and all members contributed to their respective functional areas.
+
+---
+
+# 7. Sprint 1 Retrospective
+
+### What Went Well
+- Smooth collaboration and communication across the team
+- Clean and well-organized project structure after setup
+- Clear division of work (filters, chat, admin, general UI)
+- UI wireframes helped guide Sprint 1 execution
+- All planned Sprint 1 items were completed on time
+
+### What Could Be Improved
+- Hosting decisions delayed backend progress  
+- Stories needed more detailed breakdown  
+- Blocking issues should be raised sooner  
+
+### Action Items for Sprint 2
+- Break down user stories into smaller tasks  
+- Finalize AWS hosting in Week 1 of Sprint 2  
+- Keep updating Task Board daily  
+- Formalize API contracts before implementing them  
+
+---
+
+**End of Sprint 1 Report**# Sprint 1 – Campus Marketplace (Spartan Exchange)
+
+**Sprint Duration:** September 8, 2025 – September 21, 2025  
+**Sprint Length:** 2 Weeks  
+**Team:** CMPE 202 – Spartan Exchange  
+
+---
+
+# 1. Sprint Goal
+
+The objective of Sprint 1 was to establish the **foundation** of the Campus Marketplace project by:
+
+- Finalizing the technology stack and project structure  
+- Setting up frontend and backend scaffolding  
+- Designing complete UI wireframes  
+- Creating the initial PostgreSQL database schema  
+- Implementing a basic homepage using mock API data  
+- Establishing GitHub workflow and Scrum practices  
+
+This sprint focuses entirely on setting up the groundwork needed for future development.
+
+# 2. Sprint 1 Backlog (User Stories)
+
+| User Story ID | User Story                                                                                           | Task                                                                           | Status      |
+|---------------|-------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------|-------------|
+| **US-1**      | As a developer, I need a clean and consistent project structure so the team can develop in parallel. | Initialize repository & project folders                                        | ✔ Completed |
+| **US-2**      | As a backend engineer, I need a functioning Spring Boot service to start building APIs.              | Scaffold Spring Boot backend                                                   | ✔ Completed |
+|               |                                                                                                       | Set up listings API base structure                                             | ✔ Completed |
+| **US-3**      | As a frontend engineer, I need a working UI framework with routing.                                   | Scaffold Vite + React project                                                  | ✔ Completed |
+|               |                                                                                                       | Configure React Router & create placeholder pages                              | ✔ Completed |
+| **US-4**      | As an admin, I need an initial dashboard layout so I can begin overseeing marketplace activity.       | Build admin dashboard UI skeleton                                              | ✔ Completed |
+| **US-5**      | As a team, we need shared state management for consistent behavior across components.                 | Create and integrate React contexts                                            | ✔ Completed |
+| **US-6**      | As a backend engineer, I need database connectivity to begin storing listings and user data.          | Initial DB setup & connectivity testing                                        | ✔ Completed |
+
+---
+
+# 4. Task Board & Burndown Summary
+
+Below is the **visual representation** of the Sprint 1 workflow and progress.
+## 4.1 Sprint 1 Task Board (Visual Kanban)
+### Sprint 1 Task Board (Kanban Style)
+
+| **TO DO**                                                                                  | **DOING**                                                                  | **DONE**                                                                                     |
+|--------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|
+| 🟥 Define seller listing requirements (US-2)                                                | 🟩 Homepage UI development (Sriya – based on US-3)                          | 🟦 Project repository & folder structure initialized (US-1)                                   |
+| 🟪 Define product details fields for item view (US-3 prep)                                  | 🟪 Product Details UI layout & routing (Sriya – US-3)                       | 🟦 Spring Boot backend scaffolded (US-2)                                                      |
+| 🟥 Prepare API routes needed for Sprint 2 (supports US-2, US-3, US-6)                       | 🟥 Chat UI skeleton & message flow design (Yaswanth)                        | 🟦 Listings API base structure created (US-2)                                                 |
+| 🟩 Finalize DB attribute list (US-6 – Siddharth)                                            | 🟦 Semantic search & filter planning (Siddharth – US-6 extension)           | 🟦 Initial PostgreSQL schema drafted (Users, Listings, Messages) – (US-6)                     |
+| 🟪 Prepare chatbot interaction plan (future chat work)                                      |                                                                             | 🟪 Full UI wireframes for all screens completed (US-5)                                        |
+|                                                                                            |                                                                             | 🟩 Homepage integrated with mock API data (Sriya + Mohit – US-3 support)                      |
+|                                                                                            |                                                                             | 🟩 Product details routing created with params (Sriya – US-3)                                  |
+|                                                                                            |                                                                             | 🟪 Initial chatbot research & direction completed (Yaswanth)                                   |
+
+
+### Interpretation
+- All core Sprint 1 user stories (US-1 → US-6) moved to Done.
+- Chat planning and semantic search remained In Progress and will continue in Sprint 2.
+- All frontend and backend scaffolding tasks reached Done.
+
+---
+## 4.1.1 User Story Movement Table
+
+| User Story | Description                                                                 | Start State | End State     |
+|-----------|-------------------------------------------------------------------------------|-------------|---------------|
+| US-1      | Clean and consistent project structure                                        | Backlog     | Done          |
+| US-2      | Backend Spring Boot setup + listings API                                      | Backlog     | Done          |
+| US-3      | Frontend scaffolding + React Router + placeholder pages                       | Backlog     | Done          |
+| US-4      | Admin dashboard initial layout                                                | To Do       | Done          |
+| US-5      | Shared state management via React Contexts                                    | To Do       | Done          |
+| US-6      | Database connectivity & initial PostgreSQL schema                             | To Do       | Done          |
+
+
+This fulfills **“Update the story on your Task Board.”**
+
+---
+
+## 4.2 Sprint 1 Burndown Chart
+
+<img width="1580" height="780" alt="image" src="https://github.com/user-attachments/assets/ea06a706-37bb-4abd-b286-76d759b71804" />
+
+
+The Sprint 1 burndown is based on 6 user stories (US-1 to US-6), estimated at 4 story points each
+for a total of **24 story points**.
+
+- Day 3–4: Project structure (US-1) completed  
+- Day 5–6: Admin dashboard skeleton (US-4) completed  
+- Day 7–8: Frontend framework + routing (US-3) completed  
+- Day 9–10: Backend service + listings API base (US-2) completed  
+- Day 11–12: Shared state (React contexts – US-5) completed  
+- Day 13–14: Database setup and connectivity (US-6) completed  
+
+Actual remaining story points:
+
+Day:    0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  
+Actual: 24  24  24  20  20  16  16  12  12   8   8   4   4   0   0  
+
+The **ideal line** goes from 24 to 0 evenly across the 14 days.  
+The actual line starts above the ideal early in the sprint (setup and scaffolding), then drops more
+steeply in Week 2 as core UI, backend, and database tasks are completed, reaching **0 remaining
+points by Day 14**, indicating Sprint 1 was successfully completed.
+
+---
+
+# 5. Weekly Scrum Reports
+
+Each member’s weekly updates (Daily Scrum questions):
+
+**1. What tasks did I work on?**  
+**2. What am I planning to work on next?**  
+**3. What tasks are blocked?**  
+
+---
+
+## WEEK 1 (Sept 8 – Sept 14)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Built homepage UI elements and static featured listings 
+- Implemented general UI adjustments
+
+**2. Planning next**
+- Support backend with schema discussions
+- Connect remaining UI sections to backend APIs 
+
+**3. Blocked on**
+- Awaiting finalized API formats
+- Pending stable API responses from backend
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Built Admin Dashboard structure 
+- Updated browse, profile, and admin navigation pages 
+- Performed project cleanup and folder restructuring  
+
+**2. Planning next**
+- Extend admin moderation tools
+- Connect admin dashboard to backend endpoints
+
+**3. Blocked on**
+- Pending finalized schema for admin-related datasets
+- Awaiting consolidated DB schema for listings & users 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Designed and sketched chat page and message UI
+- Implemented initial chat routing and structure
+- Began outlining chat flow and interactions
+
+**2. Planning next**
+- Build full chat UI wireframe
+- Coordinate backend message flow and chat storage 
+
+**3. Blocked on**
+- Awaiting final messaging table/ERD
+- Need final messaging table structure and ERD approval
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Developed product filtering groundwork
+- Set up backend PostgreSQL basics
+- Created early search and filtering strategy 
+
+**2. Planning next**
+- Expand advanced filter logic
+- Align filter API with frontend consumption
+
+**3. Blocked on**
+- Waiting for backend API contract confirmation
+- Awaiting final approval of unified backend API contract 
+
+---
+
+## WEEK 2 (Sept 15 – Sept 21)
+
+### **Sriyavarma Saripella**
+**1. Worked on**
+- Integrated static UI pages with early backend structures
+- Added placeholder product details and homepage routing refinements
+- Updated general UI components to match overall layout direction
+- Provided support for frontend–backend alignment discussions
+
+**2. Planning next**
+- Begin wiring the homepage and product card data to real API responses
+- Assist in validating final database schema for listings
+- Start implementing seller-side UI wiring in Sprint 2
+
+**3. Blocked on**
+- Waiting on stable API endpoints to finalize UI data binding
+
+---
+
+### **Mohit Reddy**
+**1. Worked on**
+- Extended Admin Dashboard structure with additional navigation panels
+- Updated admin-specific pages for viewing listings and managing content
+- Refined browse page and profile page, aligning with admin flow
+- Performed merge operations and code cleanup across frontend modules 
+
+**2. Planning next**
+- Implement admin moderation logic (approve, remove listings)
+- Coordinate with backend to consume report-related endpoints
+- Build initial report management table for admin UI
+
+**3. Blocked on**
+- Pending final listing/report schema from backend 
+
+---
+
+### **Dokala Yaswanth**
+**1. Worked on**
+- Integrated early backend directories and branch restoration for chat work
+- Implemented placeholder chat components and chat page structure 
+- Began initial message container logic (UI-level only)
+- Discussed message flow and session structure with backend team
+
+**2. Planning next**
+- Build message input flow and UI interactions
+- Prepare initial chat-to-API connection plan
+- Start designing chatbot interaction pane for Sprint 2 
+
+**3. Blocked on**
+- Messaging table structure and ERD finalization
+
+---
+
+### **Siddharth Jetling**
+**1. Worked on**
+- Implemented deeper product filtering logic in React 
+- Set up filtering state management and category mapping
+- Improved backend–filter interface planning
+- Updated backend PostgreSQL setup and adjusted listing model fields
+
+**2. Planning next**
+- Implement full filter API structure (category, price, keyword)
+- Start wiring backend filters to frontend dropdowns
+- Coordinate with Sriya for product card data formatting
+
+**3. Blocked on**
+- Waiting for finalized API response formatting definitions 
+
+---
+
+# 6. Sprint 1 Review
+
+### What We Planned:
+- Set up the project structure and tools
+- Create frontend and backend scaffolding 
+- Build initial UI wireframes
+- Begin designing the PostgreSQL schema
+- Implement a basic homepage using mock data 
+- Align team workflow, branching strategy, and sprint process
+
+### What We Completed:
+- Initialized Vite + React project
+- Scaffolded Spring Boot backend with listings API placeholder
+- Built homepage layout with mock listing cards
+- Created Admin Dashboard base layout
+- Added chat page routing and initial UI structure
+- Set up PostgreSQL connection and drafted early schema
+- Performed major repo cleanup and folder restructuring
+- Established consistent development workflow on GitHub
+ 
+### What Was Not Completed:
+- Authentication and role-based access
+- Full database schema (Listings, Users, Chat, Reports)
+- CRUD functionality for listings
+- Chat backend logic and chatbot integration
+- Search/filter backend implementation
+- Admin moderation flow
+
+### Summary of Sprint 1:
+- The team successfully completed all foundational tasks required to begin core feature development in Sprint 2.
+- The core structure of the project is now in place: UI routes, backend setup, early database work, and the basic marketplace layout.
+- Technical alignment was strong, and all members contributed to their respective functional areas.
+
+---
+
+# 7. Sprint 1 Retrospective
+
+### What Went Well
+- Smooth collaboration and communication across the team
+- Clean and well-organized project structure after setup
+- Clear division of work (filters, chat, admin, general UI)
+- UI wireframes helped guide Sprint 1 execution
+- All planned Sprint 1 items were completed on time
+
+### What Could Be Improved
+- Hosting decisions delayed backend progress  
+- Stories needed more detailed breakdown  
+- Blocking issues should be raised sooner  
+
+### Action Items for Sprint 2
+- Break down user stories into smaller tasks  
+- Finalize AWS hosting in Week 1 of Sprint 2  
+- Keep updating Task Board daily  
+- Formalize API contracts before implementing them  
+
+---
+
+**End of Sprint 1 Report**
 | US-6 | Full UI wireframes | In Progress | Done |
 | US-7 | Repo structure & Git workflow | To Do | Done |
 
@@ -146,142 +1376,193 @@ Each member’s weekly updates (Daily Scrum questions):
 ## WEEK 1 (Sept 8 – Sept 14)
 
 ### **Sriyavarma Saripella**
-1. **Worked on**
-   - React app initialization  
-   - Homepage layout (navbar + featured section)  
-   - Static listing cards using mock data  
-2. **Planning next**
-   - Product details UI  
-   - Align with backend API structure  
-3. **Blocked on**
-   - Schema confirmation  
-   - API response formats  
+**1. Worked on**
+- Built homepage UI elements and static featured listings 
+- Implemented general UI adjustments
+
+**2. Planning next**
+- Support backend with schema discussions
+- Connect remaining UI sections to backend APIs 
+
+**3. Blocked on**
+- Awaiting finalized API formats
+- Pending stable API responses from backend
 
 ---
 
 ### **Mohit Reddy**
-1. **Worked on**
-   - Backend Express setup  
-   - `/api/health` & `/api/listings` mock endpoints  
-   - Initial wireframe sketches  
-2. **Planning next**
-   - Digitize wireframes  
-   - Expand mock endpoints  
-3. **Blocked on**
-   - Database schema from Siddharth  
+**1. Worked on**
+- Built Admin Dashboard structure 
+- Updated browse, profile, and admin navigation pages 
+- Performed project cleanup and folder restructuring  
+
+**2. Planning next**
+- Extend admin moderation tools
+- Connect admin dashboard to backend endpoints
+
+**3. Blocked on**
+- Pending finalized schema for admin-related datasets
+- Awaiting consolidated DB schema for listings & users 
 
 ---
 
 ### **Dokala Yaswanth**
-1. **Worked on**
-   - Chat implementation research  
-   - Basic chat UX sketches  
-   - Chatbot outline  
-2. **Planning next**
-   - Chat wireframe finalization  
-3. **Blocked on**
-   - Message table design  
+**1. Worked on**
+- Designed and sketched chat page and message UI
+- Implemented initial chat routing and structure
+- Began outlining chat flow and interactions
+
+**2. Planning next**
+- Build full chat UI wireframe
+- Coordinate backend message flow and chat storage 
+
+**3. Blocked on**
+- Awaiting final messaging table/ERD
+- Need final messaging table structure and ERD approval
 
 ---
 
 ### **Siddharth Jetling**
-1. **Worked on**
-   - Full database schema  
-   - Search strategy documentation  
-   - Schema relationship mapping  
-2. **Planning next**
-   - SQL scripts for Sprint 2  
-3. **Blocked on**
-   - Final listing fields  
+**1. Worked on**
+- Developed product filtering groundwork
+- Set up backend PostgreSQL basics
+- Created early search and filtering strategy 
+
+**2. Planning next**
+- Expand advanced filter logic
+- Align filter API with frontend consumption
+
+**3. Blocked on**
+- Waiting for backend API contract confirmation
+- Awaiting final approval of unified backend API contract 
 
 ---
 
 ## WEEK 2 (Sept 15 – Sept 21)
 
 ### **Sriyavarma Saripella**
-1. **Worked on**
-   - Completed homepage UI  
-   - Integrated `/api/listings` mock API  
-   - Product details UI (routing with params)  
-2. **Planning next**
-   - Search bar + filters  
-3. **Blocked on**
-   - Backend route `/api/listings/:id`  
+**1. Worked on**
+- Integrated static UI pages with early backend structures
+- Added placeholder product details and homepage routing refinements
+- Updated general UI components to match overall layout direction
+- Provided support for frontend–backend alignment discussions
+
+**2. Planning next**
+- Begin wiring the homepage and product card data to real API responses
+- Assist in validating final database schema for listings
+- Start implementing seller-side UI wiring in Sprint 2
+
+**3. Blocked on**
+- Waiting on stable API endpoints to finalize UI data binding
 
 ---
 
 ### **Mohit Reddy**
-1. **Worked on**
-   - Completed digital wireframes (homepage, listings, admin, chat)  
-   - Extended mock API  
-   - Backend routing cleanup  
-   - Assisted frontend integration  
-2. **Planning next**
-   - Database integration  
-3. **Blocked on**
-   - AWS hosting decision  
+**1. Worked on**
+- Extended Admin Dashboard structure with additional navigation panels
+- Updated admin-specific pages for viewing listings and managing content
+- Refined browse page and profile page, aligning with admin flow
+- Performed merge operations and code cleanup across frontend modules 
+
+**2. Planning next**
+- Implement admin moderation logic (approve, remove listings)
+- Coordinate with backend to consume report-related endpoints
+- Build initial report management table for admin UI
+
+**3. Blocked on**
+- Pending final listing/report schema from backend 
 
 ---
 
 ### **Dokala Yaswanth**
-1. **Worked on**
-   - Chat wireframes complete  
-   - Product → chat linking logic  
-2. **Planning next**
-   - Placeholder chat page in Sprint 2  
-3. **Blocked on**
-   - Message schema  
+**1. Worked on**
+- Integrated early backend directories and branch restoration for chat work
+- Implemented placeholder chat components and chat page structure 
+- Began initial message container logic (UI-level only)
+- Discussed message flow and session structure with backend team
+
+**2. Planning next**
+- Build message input flow and UI interactions
+- Prepare initial chat-to-API connection plan
+- Start designing chatbot interaction pane for Sprint 2 
+
+**3. Blocked on**
+- Messaging table structure and ERD finalization
 
 ---
 
 ### **Siddharth Jetling**
-1. **Worked on**
-   - Finalized schema (added image_url, category, etc.)  
-   - Added search documentation  
-2. **Planning next**
-   - SQL scripts for DB creation  
-3. **Blocked on**
-   - AWS environment setup  
+**1. Worked on**
+- Implemented deeper product filtering logic in React 
+- Set up filtering state management and category mapping
+- Improved backend–filter interface planning
+- Updated backend PostgreSQL setup and adjusted listing model fields
+
+**2. Planning next**
+- Implement full filter API structure (category, price, keyword)
+- Start wiring backend filters to frontend dropdowns
+- Coordinate with Sriya for product card data formatting
+
+**3. Blocked on**
+- Waiting for finalized API response formatting definitions 
 
 ---
 
 # 6. Sprint 1 Review
 
-### Completed This Sprint
-- ✔ Repo structure established  
-- ✔ UI wireframes completed  
-- ✔ Database schema finalized  
-- ✔ Express backend skeleton created  
-- ✔ Homepage + product details UI using mock API  
-- ✔ Chat & search planning completed  
+### What We Planned:
+- Set up the project structure and tools
+- Create frontend and backend scaffolding 
+- Build initial UI wireframes
+- Begin designing the PostgreSQL schema
+- Implement a basic homepage using mock data 
+- Align team workflow, branching strategy, and sprint process
 
-### Demo Delivered
-- Homepage rendering  
-- Mock API integrated  
-- Product details routing  
-- UI wireframes walkthrough  
+### What We Completed:
+- Initialized Vite + React project
+- Scaffolded Spring Boot backend with listings API placeholder
+- Built homepage layout with mock listing cards
+- Created Admin Dashboard base layout
+- Added chat page routing and initial UI structure
+- Set up PostgreSQL connection and drafted early schema
+- Performed major repo cleanup and folder restructuring
+- Established consistent development workflow on GitHub
+ 
+### What Was Not Completed:
+- Authentication and role-based access
+- Full database schema (Listings, Users, Chat, Reports)
+- CRUD functionality for listings
+- Chat backend logic and chatbot integration
+- Search/filter backend implementation
+- Admin moderation flow
+
+### Summary of Sprint 1:
+- The team successfully completed all foundational tasks required to begin core feature development in Sprint 2.
+- The core structure of the project is now in place: UI routes, backend setup, early database work, and the basic marketplace layout.
+- Technical alignment was strong, and all members contributed to their respective functional areas.
 
 ---
 
 # 7. Sprint 1 Retrospective
 
 ### What Went Well
-- Strong collaboration  
-- Clear ownership across team  
-- Solid wireframes guiding UI development  
-- Backend-frontend integration began smoothly  
+- Smooth collaboration and communication across the team
+- Clean and well-organized project structure after setup
+- Clear division of work (filters, chat, admin, general UI)
+- UI wireframes helped guide Sprint 1 execution
+- All planned Sprint 1 items were completed on time
 
 ### What Could Be Improved
-- Hosting choices delayed backend progress  
-- Stories needed smaller breakdown  
-- Blocking issues should be raised earlier  
+- Hosting decisions delayed backend progress  
+- Stories needed more detailed breakdown  
+- Blocking issues should be raised sooner  
 
 ### Action Items for Sprint 2
-- Break stories into smaller tasks  
-- Finalize AWS hosting  
-- Keep task board updated daily  
-- Finalize API contracts before development  
+- Break down user stories into smaller tasks  
+- Finalize AWS hosting in Week 1 of Sprint 2  
+- Keep updating Task Board daily  
+- Formalize API contracts before implementing them  
 
 ---
 
-
+**End of Sprint 1 Report**
