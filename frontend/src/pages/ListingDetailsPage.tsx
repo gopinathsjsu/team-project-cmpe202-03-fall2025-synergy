@@ -1,5 +1,5 @@
-import { useParams, Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, MessageCircle, Loader2, AlertCircle } from 'lucide-react'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
+import { ArrowLeft, MessageCircle, Loader2, AlertCircle, Edit } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
@@ -9,6 +9,7 @@ import { getCurrentUserId } from '../utils/auth'
 const ListingDetailsPage = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
@@ -81,7 +82,7 @@ const ListingDetailsPage = () => {
     }
 
     fetchProduct()
-  }, [id])
+  }, [id, location.state])
 
   if (loading) {
     return (
@@ -191,6 +192,23 @@ const ListingDetailsPage = () => {
         </div>
 
         <div className="space-y-4">
+          {/* Show Edit button if user is the seller */}
+          {(() => {
+            const currentUserId = getCurrentUserId()
+            const sellerId = product.sellerId || product.seller_id
+            return sellerId && currentUserId && Number(sellerId) === Number(currentUserId)
+          })() && (
+            <div className="card">
+              <button 
+                onClick={() => navigate(`/listings/${product.id}/edit`)}
+                className="btn-primary w-full flex items-center justify-center space-x-2"
+              >
+                <Edit className="h-4 w-4" />
+                <span>Edit Listing</span>
+              </button>
+            </div>
+          )}
+
           <div className="card">
             <button 
               onClick={handleChatWithSeller}

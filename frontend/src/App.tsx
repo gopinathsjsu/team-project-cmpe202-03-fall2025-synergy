@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import CreateListingPage from './pages/CreateListingPage'
+import EditListingPage from './pages/EditListingPage'
 import ChatPage from './pages/ChatPage'
 import ProfilePage from './pages/ProfilePage'
 import ListingDetailsPage from './pages/ListingDetailsPage'
@@ -67,6 +68,14 @@ function InnerApp() {
             element={
               <ProtectedRoute>
                 <CreateListingPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/listings/:id/edit" 
+            element={
+              <ProtectedRoute>
+                <EditListingPage />
               </ProtectedRoute>
             } 
           />

@@ -180,6 +180,11 @@ export const productApi = {
     return normalizeProduct(response.data)
   },
 
+  update: async (id: number, product: Partial<Omit<Product, 'id' | 'createdAt' | 'updatedAt'>>): Promise<Product> => {
+    const response = await api.put<Product>(`/products/${id}`, product)
+    return normalizeProduct(response.data)
+  },
+
   /**
    * Get paginated listings (Spring Data JPA Page format)
    * @param page Zero-based page index (default: 0)
