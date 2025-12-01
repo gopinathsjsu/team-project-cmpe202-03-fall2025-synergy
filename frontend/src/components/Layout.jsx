@@ -20,7 +20,7 @@ export default function Layout(){
   return (<Box sx={{display:'flex',minHeight:'100vh'}}>
     <CssBaseline/>
     <AppBar position="fixed" open={open}><Toolbar><IconButton onClick={()=>setOpen(!open)} edge="start" sx={{mr:2,color:'#fff'}}><MenuIcon/></IconButton>
-      <Typography variant="h6" sx={{flexGrow:1}}>spartan exchange• Admin</Typography
+      <Typography variant="h6" sx={{flexGrow:1}}>Spartan Exchange • Admin</Typography>
       <Tooltip title="Toggle light/dark"><IconButton color="inherit" onClick={color.toggleColorMode} sx={{mr:1}}><Brightness7Icon/></IconButton></Tooltip>
       {user && <Typography sx={{mr:2}}>{user.name} ({user.role})</Typography>}
       {user && <Button variant="outlined" color="inherit" onClick={()=>{logout();nav('/login');}}>Logout</Button>}
