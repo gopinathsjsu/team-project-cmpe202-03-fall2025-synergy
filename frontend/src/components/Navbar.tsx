@@ -67,7 +67,7 @@ const Navbar = () => {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
             <ShoppingBag className="h-8 w-8 text-primary-600" />
-            <span className="text-xl font-bold text-gray-900">Campus Marketplace</span>
+            <span className="text-xl font-bold text-gray-900">Spartan Exchange</span>
           </Link>
 
           {/* Search Bar */}

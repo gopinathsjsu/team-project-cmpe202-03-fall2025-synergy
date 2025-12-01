@@ -187,7 +187,7 @@ const ListingsPage = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Listings</h1>
-        <p className="text-gray-600">Discover great deals on campus marketplace</p>
+        <p className="text-gray-600">Discover great deals on Spartan Exchange</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-8">

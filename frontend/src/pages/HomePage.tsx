@@ -47,7 +47,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          Welcome to Campus Marketplace
+          Welcome to Spartan Exchange
         </h1>
         <p className="text-xl text-gray-600 mb-8">
           Buy and sell textbooks, gadgets, and essentials within your campus community
