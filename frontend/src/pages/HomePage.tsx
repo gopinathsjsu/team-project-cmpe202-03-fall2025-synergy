@@ -54,7 +54,7 @@ const HomePage = () => {
         </p>
         
         {/* Search Bar */}
-        <div className="max-w-2xl mx-auto">
+        {/* <div className="max-w-2xl mx-auto">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
@@ -68,7 +68,7 @@ const HomePage = () => {
               Search
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Categories */}
@@ -122,14 +122,16 @@ const HomePage = () => {
                 to={`/listings/${product.id}`}
                 className="card hover:shadow-md transition-shadow cursor-pointer block"
               >
-                <img
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="h-48 w-full object-cover rounded-lg mb-4"
-                  onError={(e) => { 
-                    e.currentTarget.src = "/placeholder.png"; 
-                  }}
-                />
+                <div className="h-48 w-full bg-gray-100 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={product.imageUrl || "/placeholder.png"}
+                    alt={product.name}
+                    className="max-h-full max-w-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.src = "/placeholder.png"
+                    }}
+                  />
+                </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">{product.name}</h3>
                   <p className="text-2xl font-bold text-primary-600 mb-2">${product.price}</p>

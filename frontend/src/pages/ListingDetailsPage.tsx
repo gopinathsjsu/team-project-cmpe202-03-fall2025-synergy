@@ -234,11 +234,16 @@ const ListingDetailsPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <div className="card mb-4">
-            <img 
-              src={product.imageUrl ? product.imageUrl : "/placeholder.png"} 
-              alt={product.name} 
-              className="w-full h-80 object-cover rounded-lg" 
-            />
+            <div className="w-full h-80 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+              <img
+                src={product.imageUrl || "/placeholder.png"}
+                alt={product.name}
+                className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  e.currentTarget.src = "/placeholder.png"
+                }}
+              />
+            </div>
           </div>
 
           <div className="card">

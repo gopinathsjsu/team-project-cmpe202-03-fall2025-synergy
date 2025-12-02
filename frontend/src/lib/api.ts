@@ -27,6 +27,44 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
+apiClient.interceptors.request.use((config) => {
+  console.log("📤 REQUEST:", {
+    url: config.url,
+    method: config.method,
+    headers: config.headers,
+    params: config.params,
+    body: config.data,
+  });
+
+  const token = localStorage.getItem("token");
+  if (token && config.headers) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+apiClient.interceptors.response.use(
+  (response) => {
+    console.log("📥 RESPONSE:", {
+      url: response.config.url,
+      method: response.config.method,
+      status: response.status,
+      data: response.data,
+    });
+    return response;
+  },
+  (error) => {
+    console.log("❌ RESPONSE ERROR:", {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    });
+    return Promise.reject(error);
+  }
+);
+
+
 // Legacy types for backward compatibility (if needed elsewhere)
 export type Messages = MessageDTO;
 export type startMessageRequest = StartMessageRequestDTO & { chat_id: number };
