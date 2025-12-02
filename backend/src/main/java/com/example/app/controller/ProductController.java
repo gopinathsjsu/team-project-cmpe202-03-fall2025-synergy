@@ -4,10 +4,12 @@ import com.example.app.dto.ProductResponseDto;
 import com.example.app.model.Product;
 import com.example.app.repository.ProductRepository;
 import com.example.app.service.ProductService;
+import com.example.app.util.JwtUtil;
 import com.example.app.util.ProductMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.security.access.AccessDeniedException;
 
 @RestController
 @RequestMapping("/products")
@@ -28,6 +31,9 @@ public class ProductController {
     
     @Autowired
     private ProductService productService;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
     
     /**
      * Get all products - returns all products from database (no pagination, no filtering)
@@ -164,9 +170,36 @@ public class ProductController {
      * Delete a product
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteProduct(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Missing or invalid Authorization header"));
+            }
+            
+            String token = authHeader.substring(7);
+            
+            if (!jwtUtil.validateToken(token)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("error", "Invalid or expired token"));
+            }
+            
+            Long userId = jwtUtil.extractUserId(token);
+            productService.deleteProduct(id, userId);
+            return ResponseEntity.noContent().build();
+        } catch (AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Error deleting product {}", id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to delete product"));
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import type { Product } from '../services/productApi'
 import { api } from '../lib/api'
 import { getCurrentUserId } from '../utils/auth'
 import { Toast } from '../components/Toast'
+import { subscribeToListingDeleted } from '../utils/listingEvents'
 
 const ListingDetailsPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -152,6 +153,18 @@ const ListingDetailsPage = () => {
 
     fetchProduct()
   }, [id, location.state])
+
+  useEffect(() => {
+    const unsubscribe = subscribeToListingDeleted((listingId) => {
+      if (Number(id) === listingId) {
+        setProduct(null)
+        setError('This listing has been removed by the seller.')
+      }
+    })
+    return () => {
+      unsubscribe?.()
+    }
+  }, [id])
 
   const handleMarkAsSold = async () => {
     if (!product || !id) return

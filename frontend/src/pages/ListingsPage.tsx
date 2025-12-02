@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
 import Pagination from '../components/Pagination'
+import { subscribeToListingDeleted } from '../utils/listingEvents'
 
 const ListingsPage = () => {
   // Filter state
@@ -87,6 +88,15 @@ const ListingsPage = () => {
     }
 
     fetchAllProducts()
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = subscribeToListingDeleted((listingId) => {
+      setAllProducts(prev => prev.filter(product => product.id !== listingId))
+    })
+    return () => {
+      unsubscribe?.()
+    }
   }, [])
 
   // Client-side filtering: category, price range, and keyword search

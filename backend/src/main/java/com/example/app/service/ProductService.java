@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -330,10 +331,20 @@ public class ProductService {
     }
     
     /**
-     * Delete a product
+     * Delete a product ensuring the requester is the owner
      */
-    public void deleteProduct(Long id) {
+    @Transactional
+    public void deleteProduct(Long id, Long requesterId) {
         Product product = getProductById(id);
+        
+        if (product.getSellerId() == null) {
+            throw new RuntimeException("Product does not have a seller assigned");
+        }
+        
+        if (requesterId == null || !product.getSellerId().equals(requesterId)) {
+            throw new AccessDeniedException("You are not authorized to delete this listing");
+        }
+        
         productRepository.delete(product);
     }
     

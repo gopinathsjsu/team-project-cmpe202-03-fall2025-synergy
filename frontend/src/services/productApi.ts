@@ -191,6 +191,10 @@ export const productApi = {
     return normalizeProduct(response.data)
   },
 
+  delete: async (id: number): Promise<void> => {
+    await api.delete(`/listings/${id}`)
+  },
+
   /**
    * Get paginated listings (Spring Data JPA Page format)
    * @param page Zero-based page index (default: 0)

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Search, Filter, BookOpen, Laptop, Home, Gamepad2, Loader2 } from 'lucide-react'
 import { productApi } from '../services/productApi'
 import type { Product } from '../services/productApi'
+import { subscribeToListingDeleted } from '../utils/listingEvents'
 
 const HomePage = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -40,6 +41,15 @@ const HomePage = () => {
       }
     }
     fetchFeatured()
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = subscribeToListingDeleted((listingId) => {
+      setFeaturedProducts(prev => prev.filter(product => product.id !== listingId))
+    })
+    return () => {
+      unsubscribe?.()
+    }
   }, [])
 
   return (

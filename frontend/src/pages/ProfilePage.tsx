@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Settings, ShoppingBag, MessageCircle, Edit, Camera, Loader2 } from 'lucide-react'
+import { Settings, ShoppingBag, MessageCircle, Edit, Camera, Loader2, Trash2 } from 'lucide-react'
 import { authApi, type User } from '../services/authApi'
 import { productApi, type Product } from '../services/productApi'
+import { emitListingDeleted } from '../utils/listingEvents'
 
 interface UserProfile {
   name: string
@@ -20,6 +21,9 @@ const ProfilePage = () => {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [userData, setUserData] = useState<User | null>(null)
   const [userListings, setUserListings] = useState<Product[]>([])
+  const [deletingListingId, setDeletingListingId] = useState<number | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [actionMessage, setActionMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -138,6 +142,46 @@ const ProfilePage = () => {
     { id: 'messages', label: 'Messages', icon: MessageCircle },
     { id: 'settings', label: 'Settings', icon: Settings }
   ]
+
+  const handleDeleteListing = async (listingId: number) => {
+    if (!userData) return
+
+    const listing = userListings.find(item => item.id === listingId)
+    const sellerId = listing?.sellerId ?? listing?.seller_id
+    if (!listing || sellerId !== userData.id) {
+      setDeleteError('You are not authorized to delete this listing.')
+      return
+    }
+
+    const confirmed = window.confirm('Delete this listing? This action cannot be undone.')
+    if (!confirmed) return
+
+    try {
+      setDeleteError(null)
+      setActionMessage(null)
+      setDeletingListingId(listingId)
+      await productApi.delete(listingId)
+      setUserListings(prev => prev.filter(item => item.id !== listingId))
+      emitListingDeleted(listingId)
+      setActionMessage('Listing deleted successfully.')
+      setTimeout(() => setActionMessage(null), 4000)
+    } catch (err: unknown) {
+      console.error('Error deleting listing:', err)
+      const error = err as {
+        response?: {
+          data?: {
+            error?: string
+          }
+          status?: number
+        }
+        message?: string
+      }
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to delete listing. Please try again.'
+      setDeleteError(errorMessage)
+    } finally {
+      setDeletingListingId(null)
+    }
+  }
 
   if (loading) {
     return (
@@ -269,6 +313,12 @@ const ProfilePage = () => {
                   Create New Listing
                 </button>
               </div>
+
+              {(deleteError || actionMessage) && (
+                <div className={`mb-6 rounded-md px-4 py-3 ${deleteError ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-green-50 border border-green-200 text-green-700'}`}>
+                  {deleteError || actionMessage}
+                </div>
+              )}
               
               {userListings.length === 0 ? (
                 <div className="text-center py-12">
@@ -315,17 +365,51 @@ const ProfilePage = () => {
                           }`}>
                             {listing.status === 'SOLD' || listing.status === 'sold' ? 'SOLD' : (listing.status || 'active').toUpperCase()}
                           </span>
-                          {listing.status !== 'SOLD' && listing.status !== 'sold' && (
-                            <button 
-                              className="text-primary-600 hover:text-primary-700 text-sm font-medium"
-                              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                e.stopPropagation()
-                                navigate(`/listings/${listing.id}/edit`)
-                              }}
-                            >
-                              Edit
-                            </button>
-                          )}
+                          {(() => {
+                            const sellerId = listing.sellerId ?? listing.seller_id
+                            const isOwner = sellerId != null && userData?.id === sellerId
+                            const isSold = listing.status === 'SOLD' || listing.status === 'sold'
+                            if (!isOwner) return null
+                            return (
+                              <div className="flex items-center gap-3">
+                                {!isSold && (
+                                  <button 
+                                    className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                                    onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                      e.stopPropagation()
+                                      navigate(`/listings/${listing.id}/edit`)
+                                    }}
+                                  >
+                                    Edit
+                                  </button>
+                                )}
+                                <button
+                                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                    e.stopPropagation()
+                                    handleDeleteListing(listing.id)
+                                  }}
+                                  disabled={deletingListingId === listing.id}
+                                  className={`text-sm font-medium inline-flex items-center gap-1 ${
+                                    deletingListingId === listing.id
+                                      ? 'text-gray-400 cursor-not-allowed'
+                                      : 'text-red-600 hover:text-red-700'
+                                  }`}
+                                >
+                                  {deletingListingId === listing.id ? (
+                                    <>
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      Deleting...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Trash2 className="h-4 w-4" />
+                                      Delete
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            )
+                          })()}
                         </div>
                       </div>
                     </div>
