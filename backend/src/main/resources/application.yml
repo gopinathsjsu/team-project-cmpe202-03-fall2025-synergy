@@ -55,8 +55,4 @@ aws:
   s3:
     bucket-name: spartan-exchange-s3
     region: us-east-1
-  # AWS credentials
-  # ⚠️ SECURITY WARNING: These credentials are in the config file
-  # For production, use environment variables instead
-  access-key-id: AKIA2ONKSSNW6AJGPORZ
-  secret-access-key: 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
+  
