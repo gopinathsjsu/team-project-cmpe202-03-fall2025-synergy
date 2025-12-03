@@ -82,6 +82,48 @@ Admins can:
 - PostgreSQL database managed via AWS RDS  
 
 ---
+Areas of Contributions:
+
+1.⁠ ⁠Mohit Reddy Amanaganti  
+Primary Component Ownership: Admin Dashboard & User Management  
+Key Contributions:  
+- Admin dashboard frontend development and database connectivity  
+- User profile management and authentication pages  
+- Browse page and listing page improvements  
+- Bug fixes and error resolution across multiple components  
+- Integration and deployment coordination  
+
+2.⁠ ⁠Siddharth Jetling  
+Primary Component Ownership: Backend Infrastructure & Search Functionality  
+Key Contributions:  
+- PostgreSQL RDS setup and database configuration  
+- Semantic search implementation for intelligent product discovery  
+- Login/registration system development  
+- Backend API development and infrastructure  
+- Database schema design and optimization
+- Setting up AWS EC2 instances, load balancers, and auto-scaling groups
+
+
+3.⁠ ⁠Sriya Varma Saripella  
+Primary Component Ownership: Product Listing & Homepage Features  
+Key Contributions:  
+- Product details page design and implementation  
+- Featured listings integration with real product data  
+- Category-based filtering and navigation system  
+- Homepage to listings page routing  
+- Frontend component development for product browsing  
+
+4.⁠ ⁠Yaswanth Venkata Satya Naga Sai Dokala  
+Primary Component Ownership: Chat System & Database Architecture  
+Key Contributions:  
+- In-app chat functionality and APIs  
+- Database creation and PostgreSQL setup  
+- Chat page integration with products  
+- Real-time messaging system development  
+- Database restoration and maintenance
+- Setting up AWS EC2 instances, load balancers, and auto-scaling groups
+ 
+
 
 ## 📂 Documentation
 
